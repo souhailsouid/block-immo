@@ -34,7 +34,7 @@ export default [
       'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx'] }],
       'react/jsx-props-no-spreading': 'off',
       'react/function-component-definition': [
-        'warn',
+        'warn', 
         {
           namedComponents: 'arrow-function',
           unnamedComponents: 'arrow-function'

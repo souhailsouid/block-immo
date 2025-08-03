@@ -25,11 +25,10 @@ const PropertyDetailsTable = ({
   const renderTableCells = rows.map((row, key) => {
     const tableRows = [];
     const rowKey = `row-${key}`;
-    Object.entries(row).map(([cellTitle, cellContent]) => {
-
-    return (
-      Array.isArray(cellContent)
-        ? tableRows.push(
+    
+    Object.entries(row).forEach(([cellTitle, cellContent]) => {
+      if (Array.isArray(cellContent)) {
+        tableRows.push(
           <PropertyDetailsTableCell
             key={cellContent[1]}
             title={cellTitle}
@@ -37,20 +36,20 @@ const PropertyDetailsTable = ({
             image={cellContent[0]}
             noBorder={key === rows.length - 1}
           />
-        )
-        : tableRows.push(
+        );
+      } else {
+        tableRows.push(
           <PropertyDetailsTableCell
             key={cellContent}
             title={cellTitle}
             content={cellContent}
             noBorder={key === rows.length - 1}
           />
-        )
-      )
+        );
+      }
     });
 
     return <TableRow key={rowKey}>{tableRows}</TableRow>;
-
   });
 
   return (
@@ -60,7 +59,7 @@ const PropertyDetailsTable = ({
           <TableHead>
             <MDBox component="tr" width="max-content" display="block" mb={1.5}>
               <MDTypography variant="h6" component="td">
-                {title}
+                {title} 
               </MDTypography>
             </MDBox>
           </TableHead>

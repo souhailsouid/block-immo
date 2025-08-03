@@ -1,0 +1,67 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowInvestorReadPropertiesOnly",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Query"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:eu-west-3:*:table/block-immo-properties-dev"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "dynamodb:Attributes": ["id", "title", "description", "price", "location", "status", "photos", "createdAt"]
+        }
+      }
+    },
+    {
+      "Sid": "AllowInvestorOwnProfileOnly",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:eu-west-3:*:table/block-immo-users-dev"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "dynamodb:LeadingKeys": ["${cognito-identity.amazonaws.com:sub}"]
+        }
+      }
+    },
+    {
+      "Sid": "AllowS3ReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::block-immo-assets-dev/properties/*",
+        "arn:aws:s3:::block-immo-assets-dev/users/${cognito-identity.amazonaws.com:sub}/*"
+      ]
+    },
+    {
+      "Sid": "AllowCognitoSyncReadOnly",
+      "Effect": "Allow",
+      "Action": [
+        "cognito-sync:ListDatasets",
+        "cognito-sync:DescribeDataset",
+        "cognito-sync:GetRecords",
+        "cognito-sync:UpdateRecords"
+      ],
+      "Resource": [
+        "arn:aws:cognito-sync:eu-west-3:*:identitypool/*/dataset/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "cognito-identity.amazonaws.com:sub": "${cognito-identity.amazonaws.com:sub}"
+        }
+      }
+    }
+  ]
+} 

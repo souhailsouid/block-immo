@@ -8,103 +8,77 @@ import FormField from 'layouts/pages/users/new-user/components/FormField';
 import MDDatePicker from 'components/MDDatePicker';
 import FormFieldSelect from 'components/FormFieldSelect';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { propertyTimelineValidation } from 'validations/propertyValidation';
+import { PROPERTY_TIMELINE_STATUS_CONFIG, PROPERTY_TIMELINE_STATUS_OPTIONS } from 'constants/propertyConstants';
+import { formatDateForDisplay } from 'utils/date';
+import { onSubmitForm } from 'utils/validateForms';
+import { mergeInitialValues } from 'utils/formUtils';
+import { DEFAULT_VALUES_PROPERTY_TIMELINE } from 'utils/formInitialValues';
+import { useNotification } from 'context/NotificationContext';
 
-const validationSchema = Yup.object().shape({
-  timelineData: Yup.array()
-    .of(
-      Yup.object().shape({
-        status: Yup.string()
-          .oneOf(['completed', 'pending', 'projected'])
-          .required('Status is required'),
-        icon: Yup.string().required('Icon is required'),
-        title: Yup.string().required('Event title is required'),
-        date: Yup.date().required('Event date is required'),
-        description: Yup.string().required('Event description is required'),
-        badges: Yup.array().of(Yup.string()),
-      })
-    )
-    .min(1, 'At least one timeline event is required'),
-});
+const PropertyTimelineForm = ({ initialData = {}, onSave, onCancel }) => {
+  const { showNotification } = useNotification();
 
-// Mapping status to color and icon
-const statusConfig = {
-  completed: {
-    color: 'success',
-    defaultIcon: 'check',
-    label: 'Completed',
-    description: 'Event has been completed successfully',
-  },
-  pending: {
-    color: 'info',
-    defaultIcon: 'schedule',
-    label: 'Pending',
-    description: 'Event is currently in progress or waiting',
-  },
-  projected: {
-    color: 'secondary',
-    defaultIcon: 'event',
-    label: 'Projected',
-    description: 'Event is planned for the future',
-  },
-};
+  const initialValues = mergeInitialValues(
+    { timelineData: initialData.timelineData },
+    DEFAULT_VALUES_PROPERTY_TIMELINE
+  );
 
-// Helper function to format date for display
-const formatDateForDisplay = (date) => {
-  if (!date) return '';
-  const d = new Date(date);
-  const options = {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  };
-  return d.toLocaleDateString('en-US', options);
-};
+  // 🎯 Configuration spécifique pour ce formulaire
+  const formConfig = {
+    cleanFields: ['updatedAt', 'createdAt', 'propertyId'],
+    validate: (values) => {
+      // Validation spécifique pour la timeline
+      if (!values.timelineData || values.timelineData.length === 0) {
+        showNotification(
+          'Business Validation Error',
+          'At least one timeline event is required',
+          'error',
+          { duration: 3000, autoHide: true }
+        );
+        return 'At least one timeline event is required';
+      }
 
-const PropertyTimelineForm = ({ initialData = {}, onSave, hideButtons = false }) => {
-  const defaultTimelineData = [
-    {
-      status: 'completed',
-      icon: 'check',
-      title: 'Property funding complete!',
-      date: new Date('2025-07-10'),
-      description: 'The property has been fully funded by investors.',
-      badges: ['check'],
-    },
-    {
-      status: 'pending',
-      icon: 'vpn_key',
-      title: 'Share certificates issued',
-      date: new Date('2025-07-25'),
-      description:
-        'Your Property Share Certificates will be issued 2 weeks after the property is funded.',
-      badges: ['check'],
-    },
-    {
-      status: 'projected',
-      icon: 'payments',
-      title: 'First rental payment',
-      date: new Date('2025-09-30'),
-      description:
-        'We project that the first rental payment will be paid by 31 August 2025, with a guaranteed payment date no later than 30 September 2025.',
-      badges: ['check'],
-    },
-  ];
-
-  const initialValues = {
-    timelineData: initialData.timelineData || defaultTimelineData,
+      // Validation de chaque événement
+      for (let i = 0; i < values.timelineData.length; i++) {
+        const event = values.timelineData[i];
+        if (!event.title || event.title.trim() === '') {
+          showNotification(
+            'Business Validation Error',
+            `Event ${i + 1} title is required`,
+            'error',
+            { duration: 3000, autoHide: true }
+          );
+          return `Event ${i + 1} title is required`;
+        }
+        if (!event.description || event.description.trim() === '') {
+          showNotification(
+            'Business Validation Error',
+            `Event ${i + 1} description is required`,
+            'error',
+            { duration: 3000, autoHide: true }
+          );
+          return `Event ${i + 1} description is required`;
+        }
+        if (!event.date) {
+          showNotification(
+            'Business Validation Error',
+            `Event ${i + 1} date is required`,
+            'error',
+            { duration: 3000, autoHide: true }
+          );
+          return `Event ${i + 1} date is required`;
+        }
+      }
+      return null;
+    }
   };
 
-  const statusOptions = [
-    { value: 'completed', label: 'Completed' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'projected', label: 'Projected' },
-  ];
-
-  const handleSubmit = (values, { setSubmitting }) => {
+  const handleSubmit = (values, { setSubmitting, setErrors }) => {
     // Process the data before saving
     const processedData = {
       timelineData: values.timelineData.map((event, index) => {
-        const config = statusConfig[event.status];
+        const config = PROPERTY_TIMELINE_STATUS_CONFIG[event.status];
 
         return {
           ...event,
@@ -116,14 +90,18 @@ const PropertyTimelineForm = ({ initialData = {}, onSave, hideButtons = false })
       }),
     };
 
-    onSave(processedData);
-    setSubmitting(false);
+    onSubmitForm(processedData, onSave, {
+      setSubmitting,
+      setErrors,
+      cleanFields: formConfig.cleanFields,
+      validate: formConfig.validate
+    });
   };
 
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={validationSchema}
+      validationSchema={propertyTimelineValidation}
       onSubmit={handleSubmit}
     >
       {({ values, isSubmitting, handleSubmit, setFieldValue }) => {
@@ -140,7 +118,7 @@ const PropertyTimelineForm = ({ initialData = {}, onSave, hideButtons = false })
               {({ push, remove }) => (
                 <Grid container spacing={3}>
                   {values.timelineData.map((event, index) => {
-                    const statusInfo = statusConfig[event.status];
+                    const statusInfo = PROPERTY_TIMELINE_STATUS_CONFIG[event.status];
                     return (
                       <Grid item xs={12} key={index}>
                         <Card sx={{ p: 3, position: 'relative' }}>
@@ -210,18 +188,18 @@ const PropertyTimelineForm = ({ initialData = {}, onSave, hideButtons = false })
                               <FormFieldSelect
                                 label="Status"
                                 name={`timelineData.${index}.status`}
-                                options={statusOptions}
+                                options={PROPERTY_TIMELINE_STATUS_OPTIONS}
                                 onChange={(e) => {
                                   const newStatus = e.target.value;
                                   setFieldValue(`timelineData.${index}.status`, newStatus);
                                   // Auto-set default icon for the status if current icon is the old default
                                   const currentIcon = values.timelineData[index].icon;
                                   const oldStatus = event.status;
-                                  const oldDefaultIcon = statusConfig[oldStatus]?.defaultIcon;
+                                  const oldDefaultIcon = PROPERTY_TIMELINE_STATUS_CONFIG[oldStatus]?.defaultIcon;
                                   if (currentIcon === oldDefaultIcon) {
                                     setFieldValue(
                                       `timelineData.${index}.icon`,
-                                      statusConfig[newStatus]?.defaultIcon
+                                      PROPERTY_TIMELINE_STATUS_CONFIG[newStatus]?.defaultIcon
                                     );
                                   }
                                 }}
@@ -267,21 +245,19 @@ const PropertyTimelineForm = ({ initialData = {}, onSave, hideButtons = false })
             </FieldArray>
 
             {/* Submit Buttons */}
-            {!hideButtons && (
-              <MDBox mt={4} display="flex" justifyContent="flex-end" gap={2}>
-                <MDButton variant="outlined" color="secondary" onClick={() => onSave(null)}>
-                  Cancel
-                </MDButton>
-                <MDButton
-                  variant="contained"
-                  color="customBlue"
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Saving...' : 'Save Timeline'}
-                </MDButton>
-              </MDBox>
-            )}
+            <MDBox mt={4} display="flex" justifyContent="flex-end" gap={2}>
+              <MDButton variant="outlined" color="secondary" onClick={() => onCancel(null)}>
+                Cancel
+              </MDButton>
+              <MDButton
+                variant="contained"
+                color="customBlue"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Timeline'}
+              </MDButton>
+            </MDBox>
           </Form>
         );
       }}
@@ -290,9 +266,9 @@ const PropertyTimelineForm = ({ initialData = {}, onSave, hideButtons = false })
 };
 
 PropertyTimelineForm.propTypes = {
-  initialData: PropTypes.object,
-  onSave: PropTypes.func,
-  hideButtons: PropTypes.bool,
+  initialData: PropTypes.object.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default PropertyTimelineForm;

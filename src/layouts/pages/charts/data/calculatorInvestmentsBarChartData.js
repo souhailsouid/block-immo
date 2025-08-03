@@ -18,11 +18,9 @@ const calculatorInvestmentsBarChartData = {
         color: "success",
         data: [ 10000,  13000,  16000,  19000, 22000],
       },
-      
-      
+
     ],
   };
-  
-  
+
   export default calculatorInvestmentsBarChartData;
   

@@ -19,6 +19,7 @@ const BookingCard = ({
   price = '',
   location = '',
   link = '',
+  status = '',
 }) => {
   const descriptionProperties = [
     {
@@ -87,6 +88,31 @@ const BookingCard = ({
             zIndex={1}
             sx={{ transition: 'all 0.3s ease-in-out' }}
           />
+          {/* Badge de status */}
+          {status && (
+            <MDBox
+              position="absolute"
+              top={8}
+              right={8}
+              zIndex={2}
+              sx={{
+                backgroundColor: status === 'COMMERCIALIZED' ? '#4caf50' : 
+                              status === 'FUNDED' ? '#2196f3' : 
+                              status === 'IN_PROGRESS' ? '#ff9800' : '#757575',
+                color: 'white',
+                padding: '4px 8px',
+                borderRadius: '12px',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}
+            >
+              {status === 'COMMERCIALIZED' ? 'Available' : 
+               status === 'FUNDED' ? 'Funded' : 
+               status === 'IN_PROGRESS' ? 'In Progress' : status}
+            </MDBox>
+          )}
           <MDBox
             borderRadius="md"
             shadow="md"
@@ -200,8 +226,9 @@ BookingCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   price: PropTypes.string.isRequired,
-  location: PropTypes.node.isRequired,
-  action: PropTypes.oneOfType([PropTypes.bool, PropTypes.node]),
+  location: PropTypes.string.isRequired,
+  link: PropTypes.string.isRequired,
+  status: PropTypes.string,
 };
 
 export default BookingCard;

@@ -8,12 +8,16 @@ import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDBadge from "components/MDBadge";
 
-function Authentication() {
+import { useUserProfileDynamo } from "hooks/useUserProfileDynamo";
+
+const Authentication = () => {
+  const {userProfile} = useUserProfileDynamo();
+  const phoneNumber = userProfile?.phone;
   return (
     <Card id="2fa" sx={{ overflow: "visible" }}>
       <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
         <MDTypography variant="h5">Two-factor authentication</MDTypography>
-        <MDBadge variant="contained" color="success" badgeContent="enabled" container />
+        <MDBadge variant="contained" color="error" badgeContent="disabled" container />
       </MDBox>
       <MDBox p={3}>
         <MDBox
@@ -35,7 +39,7 @@ function Authentication() {
                 No Security keys
               </MDTypography>
             </MDBox>
-            <MDButton variant="outlined" color="dark" size="small">
+            <MDButton variant="outlined" color="dark" size="small" disabled>
               add
             </MDButton>
           </MDBox>
@@ -57,10 +61,10 @@ function Authentication() {
           >
             <MDBox mx={{ xs: 0, sm: 2 }} mb={{ xs: 1, sm: 0 }}>
               <MDTypography variant="button" color="text" fontWeight="regular">
-                +3012374423
+                {phoneNumber}
               </MDTypography>
             </MDBox>
-            <MDButton variant="outlined" color="dark" size="small">
+            <MDButton variant="outlined" color="dark" size="small" disabled>
               edit
             </MDButton>
           </MDBox>
@@ -85,7 +89,7 @@ function Authentication() {
                 Not Configured
               </MDTypography>
             </MDBox>
-            <MDButton variant="outlined" color="dark" size="small">
+            <MDButton variant="outlined" color="dark" size="small" disabled>
               set up
             </MDButton>
           </MDBox>

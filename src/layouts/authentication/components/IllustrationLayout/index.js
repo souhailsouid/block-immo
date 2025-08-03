@@ -11,92 +11,94 @@ import MDTypography from 'components/MDTypography';
 
 // Material Dashboard 3 PRO React examples
 import PageLayout from 'examples/LayoutContainers/PageLayout';
-import NotificationNavbar from 'layouts/pages/notifications/NotificationNavbar';
 
 // Material Dashboard 3 PRO React context
 import { useMaterialUIController } from 'context';
 
 const IllustrationLayout = ({
-  header = '',
   title = '',
   description = '',
   illustration = '',
+  backgroundSize = 'cover',
   children,
-  isNotification = false,
-  message = '',
-  color = 'customBlue',
-  fontSize = 'medium',
-  setNotification = () => {},
+
 }) => {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
+  console.log('🔍 IllustrationLayout - Props:', { title, description, illustration, backgroundSize });
+
   return (
     <PageLayout background="white">
-      {/* <DefaultNavbar
-        routes={pageRoutes}
-        action={{
-          type: "external",
-          route: "https://creative-tim.com/product/material-dashboard-pro-react",
-          label: "buy now",
-        }}
-      /> */}
-
-      {/* {isNotification && (
-        <NotificationNavbar
-          message={message}
-          setNotification={setNotification}
-          color={color}
-          fontSize={fontSize}
-        />
-      )} */}
       <Grid
         container
         sx={{
           backgroundColor: ({ palette: { background, white } }) =>
             darkMode ? background.default : white.main,
+          minHeight: '100vh',
         }}
       >
-        <Grid item xs={12} lg={6}>
-          <MDBox
-            display={{ xs: 'none', lg: 'flex' }}
-            alignItems="center"
-            justifyContent="center"
-            style={{
-              backgroundPosition: 'center',
-              backgroundSize: 'contain',
-            }}
-            width="calc(100% - 2rem)"
-            padding="2rem"
-            height="calc(100vh)"
-            borderRadius="lg"
-            ml={2}
-            mb={2}
-            sx={{ backgroundImage: `url(${illustration})` }}
-          />
+        {/* Section Image - Gauche */}
+        <Grid 
+          item 
+          xs={12} 
+          lg={6}
+          sx={{
+            display: { xs: 'none', lg: 'flex' },
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundImage: `url(${illustration})`,
+            backgroundPosition: 'center',
+            backgroundSize: backgroundSize,
+            backgroundRepeat: 'no-repeat',
+            minHeight: '100vh',
+            position: 'relative',
+          }}
+        >
+        
+          
+          {/* Contenu informatif sur l'image */}
+       
         </Grid>
-        <Grid item xs={11} sm={8} md={6} lg={6} xl={6} sx={{ mx: 'auto', px: 2, pt: 3 }}>
-          <Grid item xs={11} sm={8} md={6} lg={6} xl={6} sx={{ mx: 'auto' }}>
-            <MDBox display="flex" flexDirection="column" justifyContent="center" height="100vh">
-              <MDBox py={3} px={3} textAlign="center">
-                {!header ? (
-                  <>
-                    <MDBox mb={1} textAlign="center">
-                      <MDTypography variant="h4" fontWeight="bold">
-                        {title}
-                      </MDTypography>
-                    </MDBox>
-                    <MDTypography variant="body2" color="text">
-                      {description}
-                    </MDTypography>
-                  </>
-                ) : (
-                  header
-                )}
-              </MDBox>
-              <MDBox p={3}>{children}</MDBox>
+
+        {/* Section Formulaire - Droite */}
+        <Grid 
+          item 
+          xs={12} 
+          lg={6}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '100vh',
+            p: { xs: 2, sm: 4, lg: 6 },
+          }}
+        >
+          <MDBox
+            width="100%"
+            maxWidth={500}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            {/* Titre et description */}
+            <MDBox textAlign="center" mb={4}>
+              <MDTypography variant="h3" fontWeight="bold" mb={2}>
+                {title}
+              </MDTypography>
+              <MDTypography variant="body1" color="text.secondary">
+                {description}
+              </MDTypography>
             </MDBox>
-          </Grid>
+
+            {/* Contenu du formulaire */}
+            <MDBox width="100%">
+              {children}
+            </MDBox>
+          </MDBox>
         </Grid>
       </Grid>
     </PageLayout>

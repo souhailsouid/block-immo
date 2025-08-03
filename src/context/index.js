@@ -54,7 +54,7 @@ function reducer(state, action) {
 }
 
 // Material Dashboard 3 PRO React context provider
-function MaterialUIControllerProvider({ children }) {
+const MaterialUIControllerProvider = ({ children }) => {
   const initialState = {
     miniSidenav: false,
     transparentSidenav: false,

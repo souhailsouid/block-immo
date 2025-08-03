@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-// react-router-dom components
 import { Link, useNavigate } from 'react-router-dom';
-import { getCurrentUser, signUp } from '@aws-amplify/auth';
+import { signUp as amplifySignUp } from '@aws-amplify/auth';
 
 // Material Dashboard 3 PRO React components
 import MDBox from 'components/MDBox';
@@ -15,23 +13,27 @@ import MDButton from 'components/MDButton';
 
 // Authentication layout components
 import IllustrationLayout from 'layouts/authentication/components/IllustrationLayout';
+import NotificationNavbar from 'layouts/pages/notifications/NotificationNavbar';
 
+// Image
 import fractional_real_estate from 'assets/images/fractional_real_estate.png';
+
+// Material-UI components
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-// Import the NotificationNavbar component
-import NotificationNavbar from 'layouts/pages/notifications/NotificationNavbar';
-import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 
 const SignUpIllustration = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => event.preventDefault();
-  const [isLoading, setIsLoading] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(true);
+
   const schema = Yup.object().shape({
     email: Yup.string()
       .email('Invalid email')
@@ -44,15 +46,16 @@ const SignUpIllustration = () => {
       .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
       .matches(/[0-9]/, 'Password must contain at least one number')
       .matches(/[!@#$%^&*]/, 'Password must contain at least one special character'),
-    givenName: Yup.string()
+    firstName: Yup.string()
       .required('First name is required')
-      .min(3, 'First name must be at least 3 characters long')
-      .matches(/^[a-zA-Z]+$/, 'First name must contain only letters'),
-    familyName: Yup.string()
+      .min(2, 'First name must be at least 2 characters long')
+      .matches(/^[a-zA-Z\s]+$/, 'First name must contain only letters'),
+    lastName: Yup.string()
       .required('Last name is required')
-      .min(3, 'Last name must be at least 3 characters long')
-      .matches(/^[a-zA-Z]+$/, 'Last name must contain only letters'),
+      .min(2, 'Last name must be at least 2 characters long')
+      .matches(/^[a-zA-Z\s]+$/, 'Last name must contain only letters'),
   });
+
   const {
     register,
     handleSubmit,
@@ -62,182 +65,164 @@ const SignUpIllustration = () => {
     resolver: yupResolver(schema),
   });
 
-  useEffect(() => {
-    async function checkUser() {
-      try {
-        const user = await getCurrentUser();
-        if (user) {
-          navigate('/dashboard'); // ou la page de ton choix
-        }
-      } catch (e) {
-        // Pas d'utilisateur connecté, on affiche le formulaire
-      }
-    }
-    checkUser();
-  }, [navigate]);
-
   async function handleSignUp(data) {
     try {
       setIsLoading(true);
       setShowSuccessMessage(false);
+      setShowErrorMessage(false);
+      setError('root', null);
 
-      const user = await signUp({
+      console.log('📝 Tentative d\'inscription avec Amplify:', { email: data.email, firstName: data.firstName, lastName: data.lastName });
+
+      // Utiliser Amplify directement pour l'inscription
+      const result = await amplifySignUp({
         username: data.email,
         password: data.password,
-        signUpMethod: 'email',
         options: {
           userAttributes: {
             email: data.email,
-            given_name: data.givenName,
-            family_name: data.familyName,
+            given_name: data.firstName,
+            family_name: data.lastName,
           },
-        },
+          autoSignIn: true // Connexion automatique après inscription
+        }
       });
+
+      console.log('✅ Inscription réussie avec Amplify:', result);
       setShowSuccessMessage(true);
-      setIsLoading(false);
+      
+      // Message de confirmation
+      setError('root', { type: 'manual', message: '🎉 Inscription réussie ! Vérifiez votre email pour confirmer votre compte.' });
+      
+   
 
-      return user;
     } catch (error) {
+      console.error('❌ Erreur lors de l\'inscription:', error);
+      setShowErrorMessage(true);
+      setError('root', { 
+        type: 'manual', 
+        message: error.message || "Connection error. Please try again." 
+      });
+    } finally {
       setIsLoading(false);
-
-      // Gestion spécifique des erreurs Cognito
-      if (error.name === 'UsernameExistsException') {
-        setError('email', { type: 'manual', message: 'An account with this email already exists' });
-      } else if (error.name === 'InvalidPasswordException') {
-        setError('password', { type: 'manual', message: 'Password does not meet requirements' });
-      } else {
-        setError('root', { type: 'manual', message: error.message });
-      }
     }
   }
 
   return (
-    <MDBox>
-      {/* {showSuccessMessage && ( */}
-        <NotificationNavbar
-          color="customBlue"
-          title="Account created successfully!"
-          description="Please check your email for verification."
-          fontSize="medium"
-          dismissible={true}
-          onClose={() => setShowSuccessMessage(false)}
-          showSuccessMessage={showSuccessMessage}
-        />
-      {/* )} */}
-      {/* <Navba
-        absolute
-        light
-        isMini
-      /> */}
-      <IllustrationLayout
-        title="Sign Up"
-        description="Create an account to get started"
-        illustration={fractional_real_estate}
-        isNotification={showSuccessMessage}
-        message="Account created successfully, please check your email for verification."
-        setNotification={setShowSuccessMessage}
-      >
-        <MDBox component="form" role="form" onSubmit={handleSubmit(handleSignUp)}>
-          <MDBox mb={2}>
-            <MDInput
-              type="text"
-              label="First Name"
-              fullWidth
-              name="givenName"
-              {...register('givenName')}
-              error={!!errors.givenName}
-              helperText={errors.givenName?.message}
-              InputLabelProps={{ shrink: true }}
-            />
-          </MDBox>
-          <MDBox mb={2}>
-            <MDInput
-              type="text"
-              label="Last Name"
-              fullWidth
-              name="familyName"
-              {...register('familyName')}
-              error={!!errors.familyName}
-              helperText={errors.familyName?.message}
-              InputLabelProps={{ shrink: true }}
-            />
-          </MDBox>
-          <MDBox mb={2}>
-            <MDInput
-              type="email"
-              label="Email"
-              fullWidth
-              name="email"
-              {...register('email')}
-              error={!!errors.email}
-              helperText={errors.email?.message}
-            />
-          </MDBox>
-          <MDBox mb={2}>
-            <MDInput
-              type={showPassword ? 'text' : 'password'}
-              label="Password"
-              fullWidth
-              name="password"
-              {...register('password')}
-              error={!!errors.password}
-              helperText={errors.password?.message}
-              InputLabelProps={{ shrink: true }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label={showPassword ? 'hide the password' : 'display the password'}
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                      size="small"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </MDBox>
-          <MDBox minHeight="10px" mb={2}>
-            {errors.root && (
-              <MDTypography variant="h6" color="error">
-                {errors.root.message}
-              </MDTypography>
-            )}
-          </MDBox>
-          <MDBox mt={4} mb={1}>
-            <MDButton
-              variant="gradient"
-              color="customBlue"
-              size="large"
-              fullWidth
-              type="submit"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Creating account...' : 'Sign up'}
-            </MDButton>
-          </MDBox>
-          <MDBox mt={3} textAlign="center">
-            <MDTypography variant="button" color="text">
-              Already have an account?{' '}
-              <MDTypography
-                component={Link}
-                to="/authentication/sign-in/illustration"
-                variant="button"
-                color="customBlue"
-                fontWeight="medium"
-                textGradient
-              >
-                Sign in
-              </MDTypography>
+    <IllustrationLayout
+      backgroundSize="contain"
+      title="Join BlockImmo"
+      description="Create your account to start investing in real estate"
+      illustration={fractional_real_estate}
+    >
+      <MDBox component="form" role="form" onSubmit={handleSubmit(handleSignUp)}>
+        {/* Affichage d'erreur ou de succès */}
+        {errors?.root && (
+          <MDBox mb={3} p={2} borderRadius={1} sx={{
+            border: '1px solid',
+            borderColor: errors.root.message?.includes('Félicitations') ? 'success.main' : 'error.main'
+          }}>
+            <MDTypography variant="body2" color={errors.root.message?.includes('Félicitations') ? 'success.dark' : 'error'}>
+              {errors.root.message}
             </MDTypography>
           </MDBox>
+        )}
+
+        <MDBox mb={2}>
+          <MDInput
+            type="text"
+            label="First Name"
+            fullWidth
+            name="firstName"
+            {...register('firstName')}
+            error={!!errors.firstName}
+            helperText={errors.firstName?.message}
+          />
         </MDBox>
-      </IllustrationLayout>
-    </MDBox>
+
+        <MDBox mb={2}>
+          <MDInput
+            type="text"
+            label="Last Name"
+            fullWidth
+            name="lastName"
+            {...register('lastName')}
+            error={!!errors.lastName}
+            helperText={errors.lastName?.message}
+          />
+        </MDBox>
+
+        <MDBox mb={2}>
+          <MDInput
+            type="email"
+            label="Email"
+            fullWidth
+            name="email"
+            {...register('email')}
+            error={!!errors.email}
+            helperText={errors.email?.message}
+          />
+        </MDBox>
+
+        <MDBox mb={2}>
+          <MDInput
+            type={showPassword ? 'text' : 'password'}
+            label="Password"
+            fullWidth
+            name="password"
+            {...register('password')}
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            InputLabelProps={{ shrink: true }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={showPassword ? 'hide the password' : 'display the password'}
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                    size="small"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </MDBox>
+
+        <MDBox mt={4} mb={1}>
+          <MDButton
+            variant="gradient"
+            color="customBlue"
+            size="large"
+            fullWidth
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Creating Account...' : 'Create Account'}
+          </MDButton>
+        </MDBox>
+
+        <MDBox mt={3} textAlign="center">
+          <MDTypography variant="button" color="text">
+            Already have an account?{' '}
+            <MDTypography
+              component={Link}
+              to="/authentication/sign-in/illustration"
+              variant="button"
+              color="customBlue"
+              fontWeight="medium"
+              textGradient
+            >
+              Sign in
+            </MDTypography>
+          </MDTypography>
+        </MDBox>
+      </MDBox>
+    </IllustrationLayout>
   );
-}
+};
 
 export default SignUpIllustration;

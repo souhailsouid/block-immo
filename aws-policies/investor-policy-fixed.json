@@ -1,0 +1,61 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowInvestorReadProperties",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:eu-west-3:*:table/block-immo-properties-dev"
+      ]
+    },
+    {
+      "Sid": "AllowInvestorProfileAccess",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:eu-west-3:*:table/block-immo-users-dev"
+      ]
+    },
+    {
+      "Sid": "AllowS3ReadAccess",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::block-immo-assets-dev",
+        "arn:aws:s3:::block-immo-assets-dev/*"
+      ]
+    },
+    {
+      "Sid": "AllowCognitoSync",
+      "Effect": "Allow",
+      "Action": [
+        "cognito-sync:*"
+      ],
+      "Resource": [
+        "arn:aws:cognito-sync:eu-west-3:*:identitypool/*"
+      ]
+    },
+    {
+      "Sid": "AllowMobileAnalytics",
+      "Effect": "Allow",
+      "Action": [
+        "mobileanalytics:PutEvents"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+} 

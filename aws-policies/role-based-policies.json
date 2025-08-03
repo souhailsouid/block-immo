@@ -1,0 +1,120 @@
+{
+  "INVESTOR": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AllowInvestorReadAccess",
+        "Effect": "Allow",
+        "Action": [
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:Scan"
+        ],
+        "Resource": [
+          "arn:aws:dynamodb:eu-west-3:*:table/block-immo-properties-dev"
+        ]
+      },
+      {
+        "Sid": "AllowInvestorProfileAccess",
+        "Effect": "Allow",
+        "Action": [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem"
+        ],
+        "Resource": [
+          "arn:aws:dynamodb:eu-west-3:*:table/block-immo-users-dev"
+        ],
+        "Condition": {
+          "StringEquals": {
+            "dynamodb:LeadingKeys": ["${cognito-identity.amazonaws.com:sub}"]
+          }
+        }
+      },
+      {
+        "Sid": "AllowS3ReadAccess",
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ],
+        "Resource": [
+          "arn:aws:s3:::block-immo-assets-dev",
+          "arn:aws:s3:::block-immo-assets-dev/*"
+        ]
+      }
+    ]
+  },
+  "PROFESSIONAL": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AllowProfessionalFullAccess",
+        "Effect": "Allow",
+        "Action": [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:Query",
+          "dynamodb:Scan"
+        ],
+        "Resource": [
+          "arn:aws:dynamodb:eu-west-3:*:table/block-immo-properties-dev",
+          "arn:aws:dynamodb:eu-west-3:*:table/block-immo-users-dev"
+        ]
+      },
+      {
+        "Sid": "AllowS3FullAccess",
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ],
+        "Resource": [
+          "arn:aws:s3:::block-immo-assets-dev",
+          "arn:aws:s3:::block-immo-assets-dev/*"
+        ]
+      }
+    ]
+  },
+  "ADMIN": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AllowAdminFullAccess",
+        "Effect": "Allow",
+        "Action": [
+          "dynamodb:*"
+        ],
+        "Resource": [
+          "arn:aws:dynamodb:eu-west-3:*:table/block-immo-*"
+        ]
+      },
+      {
+        "Sid": "AllowS3FullAccess",
+        "Effect": "Allow",
+        "Action": [
+          "s3:*"
+        ],
+        "Resource": [
+          "arn:aws:s3:::block-immo-*",
+          "arn:aws:s3:::block-immo-*/*"
+        ]
+      },
+      {
+        "Sid": "AllowCognitoAccess",
+        "Effect": "Allow",
+        "Action": [
+          "cognito-idp:AdminGetUser",
+          "cognito-idp:AdminListUsers",
+          "cognito-idp:AdminUpdateUserAttributes"
+        ],
+        "Resource": [
+          "arn:aws:cognito-idp:eu-west-3:*:userpool/*"
+        ]
+      }
+    ]
+  }
+} 

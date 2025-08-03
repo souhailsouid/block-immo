@@ -25,10 +25,21 @@ export const getCitiesByState = (countryCode, stateCode) => {
   if (!countryCode || !stateCode) return [];
   
   const cities = City.getCitiesOfState(countryCode, stateCode);
-  return cities.map(city => ({
-    value: city.name,
-    label: city.name
-  }));
+  
+  // Éliminer les doublons et créer des clés uniques
+  const uniqueCities = cities.reduce((acc, city, index) => {
+    const existingCity = acc.find(c => c.value === city.name);
+    if (!existingCity) {
+      acc.push({
+        value: city.name,
+        label: city.name,
+        key: `${city.name}-${countryCode}-${stateCode}-${index}`
+      });
+    }
+    return acc;
+  }, []);
+  
+  return uniqueCities;
 };
 
 // Get all cities for a country (without state filter)
@@ -36,10 +47,21 @@ export const getCitiesByCountry = (countryCode) => {
   if (!countryCode) return [];
   
   const cities = City.getCitiesOfCountry(countryCode);
-  return cities.map(city => ({
-    value: city.name,
-    label: city.name
-  }));
+  
+  // Éliminer les doublons et créer des clés uniques
+  const uniqueCities = cities.reduce((acc, city, index) => {
+    const existingCity = acc.find(c => c.value === city.name);
+    if (!existingCity) {
+      acc.push({
+        value: city.name,
+        label: city.name,
+        key: `${city.name}-${countryCode}-${index}`
+      });
+    }
+    return acc;
+  }, []);
+  
+  return uniqueCities;
 };
 
 // Get country name by code

@@ -20,7 +20,6 @@ const colors = {
   main: "rgba(0,0,0,0)",
 },
 
-  
   white: {
     main: "#ffffff",
     focus: "#ffffff",

@@ -19,12 +19,10 @@ import MDDropzoneRoot from "components/MDDropzone/MDDropzoneRoot";
 import { useMaterialUIController } from "context";
 
 const MDDropzone = ({ options }) => {
-  console.log('mddrop options', options);
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
   const dropzoneRef = useRef();
-  console.log('dropzoneRef', options);
   useEffect(() => {
     Dropzone.autoDiscover = false;
 

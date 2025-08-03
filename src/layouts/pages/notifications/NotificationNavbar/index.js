@@ -15,7 +15,10 @@ const NotificationNavbar = ({
   description,
   onClose, 
   showSuccessMessage,
-  dismissible = false
+  dismissible = false,
+  absolute = false,
+  light = false,
+  isMini = false
 }) => {
   // Si on a des props de notification, afficher une Snackbar
   if (title && (message || description)) {
@@ -159,26 +162,15 @@ const NotificationNavbar = ({
         }
       }}
     >
-      <MDBox display="flex" alignItems="center" justifyContent="space-between">
+      {/* <MDBox display="flex" alignItems="center" justifyContent="space-between">
         <MDTypography variant="button" fontWeight="regular" color="white" opacity={0.9}>
           Notifications
         </MDTypography>
-      </MDBox>
+      </MDBox> */}
     </MDBox>
   );
 }
 
-// Declaring default props for NotificationNavbar
-NotificationNavbar.defaultProps = {
-  absolute: false,
-  light: false,
-  isMini: false,
-  title: null,
-  message: null,
-  description: null,
-  onClose: null,
-  showSuccessMessage: false,
-  dismissible: false,
-};
+
 
 export default NotificationNavbar; 

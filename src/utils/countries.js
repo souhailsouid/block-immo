@@ -1,5 +1,5 @@
-import { countries } from 'countries-list';
 
+import { countries, languages, currencies } from 'countries-list';
 // Convert countries data to the format expected by FormFieldSelect
 export const getCountryOptions = () => {
   return Object.entries(countries)
@@ -18,10 +18,22 @@ export const getCountryName = (code) => {
 };
 
 // Get country code by name
-export const getCountryCode = (name) => {
-  if (!name) return '';
-  const entry = Object.entries(countries).find(([code, country]) => 
-    country.name.toLowerCase() === name.toLowerCase()
+
+export const getCountryCode = (countryName) => {
+  if (!countryName) return null;
+  
+  // Recherche exacte
+  const exactMatch = Object.entries(countries).find(([code, country]) => 
+    country.name.toLowerCase() === countryName.toLowerCase()
   );
-  return entry ? entry[0].toUpperCase() : '';
-}; 
+  
+  if (exactMatch) return exactMatch[0];
+  
+  // Recherche partielle (fallback)
+  const partialMatch = Object.entries(countries).find(([code, country]) => 
+    country.name.toLowerCase().includes(countryName.toLowerCase()) ||
+    countryName.toLowerCase().includes(country.name.toLowerCase())
+  );
+  
+  return partialMatch ? partialMatch[0] : null;
+};

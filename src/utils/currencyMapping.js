@@ -364,10 +364,208 @@ export const formatCurrencyByCountry = (value, countryCode, locale = 'en-US') =>
     });
   } catch (error) {
     // Fallback to USD if currency formatting fails
-    console.warn(`Currency formatting failed for ${currencyCode}, falling back to USD`);
     return value.toLocaleString(locale, {
       style: 'currency',
       currency: 'USD',
     });
   }
+}; 
+
+/**
+ * Mapping des devises vers les locales appropriées
+ * Permet un affichage correct des devises selon leur région
+ */
+export const CURRENCY_LOCALE_MAPPING = {
+  // Devises principales
+  USD: 'en-US',      // Dollar US
+  EUR: 'fr-FR',      // Euro (français)
+  GBP: 'en-GB',      // Livre Sterling
+  CHF: 'de-CH',      // Franc Suisse (allemand)
+  AED: 'ar-AE',      // Dirham (arabe)
+  
+  // Autres devises européennes
+  SEK: 'sv-SE',      // Couronne suédoise
+  NOK: 'nb-NO',      // Couronne norvégienne
+  DKK: 'da-DK',      // Couronne danoise
+  PLN: 'pl-PL',      // Zloty polonais
+  CZK: 'cs-CZ',      // Couronne tchèque
+  HUF: 'hu-HU',      // Forint hongrois
+  RON: 'ro-RO',      // Leu roumain
+  BGN: 'bg-BG',      // Lev bulgare
+  HRK: 'hr-HR',      // Kuna croate
+  
+  // Devises asiatiques
+  JPY: 'ja-JP',      // Yen japonais
+  CNY: 'zh-CN',      // Yuan chinois
+  KRW: 'ko-KR',      // Won coréen
+  SGD: 'en-SG',      // Dollar de Singapour
+  HKD: 'zh-HK',      // Dollar de Hong Kong
+  TWD: 'zh-TW',      // Dollar taïwanais
+  INR: 'en-IN',      // Roupie indienne
+  THB: 'th-TH',      // Baht thaïlandais
+  MYR: 'ms-MY',      // Ringgit malaisien
+  IDR: 'id-ID',      // Rupiah indonésien
+  PHP: 'en-PH',      // Peso philippin
+  
+  // Devises américaines
+  CAD: 'en-CA',      // Dollar canadien
+  MXN: 'es-MX',      // Peso mexicain
+  BRL: 'pt-BR',      // Real brésilien
+  ARS: 'es-AR',      // Peso argentin
+  CLP: 'es-CL',      // Peso chilien
+  COP: 'es-CO',      // Peso colombien
+  PEN: 'es-PE',      // Sol péruvien
+  
+  // Devises africaines
+  ZAR: 'en-ZA',      // Rand sud-africain
+  EGP: 'ar-EG',      // Livre égyptienne
+  NGN: 'en-NG',      // Naira nigérian
+  KES: 'sw-KE',      // Shilling kényan
+  GHS: 'en-GH',      // Cedi ghanéen
+  
+  // Devises océaniennes
+  AUD: 'en-AU',      // Dollar australien
+  NZD: 'en-NZ',      // Dollar néo-zélandais
+  
+  // Devises du Moyen-Orient
+  SAR: 'ar-SA',      // Riyal saoudien
+  QAR: 'ar-QA',      // Riyal qatari
+  KWD: 'ar-KW',      // Dinar koweïtien
+  BHD: 'ar-BH',      // Dinar bahreïni
+  OMR: 'ar-OM',      // Rial omanais
+  JOD: 'ar-JO',      // Dinar jordanien
+  LBP: 'ar-LB',      // Livre libanaise
+  ILS: 'he-IL',      // Shekel israélien
+  
+  // Devises d'Europe de l'Est
+  RUB: 'ru-RU',      // Rouble russe
+  UAH: 'uk-UA',      // Hryvnia ukrainienne
+  BYN: 'be-BY',      // Rouble biélorusse
+  KZT: 'kk-KZ',      // Tenge kazakh
+  UZS: 'uz-UZ',      // Sum ouzbek
+  GEL: 'ka-GE',      // Lari géorgien
+  AMD: 'hy-AM',      // Dram arménien
+  AZN: 'az-AZ',      // Manat azerbaïdjanais
+};
+
+/**
+ * Obtient la locale appropriée pour une devise donnée
+ * @param {string} currency - Code de la devise (ex: 'USD', 'EUR')
+ * @returns {string} Locale appropriée (ex: 'en-US', 'fr-FR')
+ */
+export const getCurrencyLocale = (currency) => {
+  if (!currency) return 'en-US'; // Locale par défaut
+  
+  const normalizedCurrency = currency.toUpperCase();
+  return CURRENCY_LOCALE_MAPPING[normalizedCurrency] || 'en-US';
+};
+
+/**
+ * Obtient les options de formatage pour une devise donnée
+ * @param {string} currency - Code de la devise
+ * @returns {Object} Options de formatage
+ */
+export const getCurrencyFormatOptions = (currency) => {
+  const locale = getCurrencyLocale(currency);
+  
+  return {
+    style: 'currency',
+    currency: currency.toUpperCase(),
+    locale: locale,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  };
+};
+
+/**
+ * Formate un montant selon la devise avec la locale appropriée
+ * @param {number} amount - Montant à formater
+ * @param {string} currency - Code de la devise
+ * @param {string} fallbackLocale - Locale de fallback (optionnel)
+ * @returns {string} Montant formaté
+ */
+export const formatCurrencyWithLocale = (amount, currency, fallbackLocale = 'en-US') => {
+  if (!amount || !currency) return '';
+  
+  try {
+    const locale = getCurrencyLocale(currency);
+    const options = getCurrencyFormatOptions(currency);
+    
+    return new Intl.NumberFormat(locale, options).format(amount);
+  } catch (error) {
+    // Fallback en cas d'erreur
+    return new Intl.NumberFormat(fallbackLocale, {
+      style: 'currency',
+      currency: currency.toUpperCase(),
+    }).format(amount);
+  }
+};
+
+/**
+ * Obtient les informations complètes sur une devise
+ * @param {string} currency - Code de la devise
+ * @returns {Object} Informations sur la devise
+ */
+export const getCurrencyInfo = (currency) => {
+  if (!currency) return null;
+  
+  const normalizedCurrency = currency.toUpperCase();
+  const locale = getCurrencyLocale(normalizedCurrency);
+  
+  return {
+    code: normalizedCurrency,
+    locale: locale,
+    formatOptions: getCurrencyFormatOptions(normalizedCurrency),
+    isRTL: locale.startsWith('ar') || locale.startsWith('he'), // Langues de droite à gauche
+  };
+};
+
+/**
+ * Génère la liste complète des devises pour les selects
+ * @returns {Array} Liste des devises avec labels et symboles
+ */
+export const getCurrencyOptions = () => {
+  const currencyFlags = {
+    USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧', CHF: '🇨🇭', AED: '🇦🇪',
+    CAD: '🇨🇦', AUD: '🇦🇺', JPY: '🇯🇵', CNY: '🇨🇳', INR: '🇮🇳',
+    BRL: '🇧🇷', MXN: '🇲🇽', SGD: '🇸🇬', HKD: '🇭🇰', SEK: '🇸🇪',
+    NOK: '🇳🇴', DKK: '🇩🇰', PLN: '🇵🇱', CZK: '🇨🇿', HUF: '🇭🇺',
+    RUB: '🇷🇺', TRY: '🇹🇷', ZAR: '🇿🇦', KRW: '🇰🇷', THB: '🇹🇭',
+    MYR: '🇲🇾', IDR: '🇮🇩', PHP: '🇵🇭', VND: '🇻🇳', EGP: '🇪🇬',
+    NGN: '🇳🇬', KES: '🇰🇪', GHS: '🇬🇭', MAD: '🇲🇦', TND: '🇹🇳',
+    QAR: '🇶🇦', SAR: '🇸🇦', KWD: '🇰🇼', BHD: '🇧🇭', OMR: '🇴🇲',
+    JOD: '🇯🇴', LBP: '🇱🇧', ILS: '🇮🇱',
+  };
+
+  const currencyNames = {
+    USD: 'Dollar US', EUR: 'Euro', GBP: 'Livre Sterling', CHF: 'Franc Suisse', AED: 'Dirham',
+    CAD: 'Dollar Canadien', AUD: 'Dollar Australien', JPY: 'Yen', CNY: 'Yuan', INR: 'Roupie',
+    BRL: 'Real', MXN: 'Peso', SGD: 'Dollar de Singapour', HKD: 'Dollar de Hong Kong', SEK: 'Couronne Suédoise',
+    NOK: 'Couronne Norvégienne', DKK: 'Couronne Danoise', PLN: 'Zloty', CZK: 'Couronne Tchèque', HUF: 'Forint',
+    RUB: 'Rouble', TRY: 'Lira Turque', ZAR: 'Rand', KRW: 'Won', THB: 'Baht',
+    MYR: 'Ringgit', IDR: 'Rupiah', PHP: 'Peso Philippin', VND: 'Dong', EGP: 'Livre Égyptienne',
+    NGN: 'Naira', KES: 'Shilling Kenyan', GHS: 'Cedi', MAD: 'Dirham Marocain', TND: 'Dinar Tunisien',
+    QAR: 'Riyal', SAR: 'Riyal Saoudien', KWD: 'Dinar Koweïtien', BHD: 'Dinar Bahreïni', OMR: 'Rial Omanais',
+    JOD: 'Dinar Jordanien', LBP: 'Livre Libanaise', ILS: 'Shekel',
+  };
+
+  const currencySymbols = {
+    USD: '$', EUR: '€', GBP: '£', CHF: 'CHF', AED: 'د.إ',
+    CAD: 'C$', AUD: 'A$', JPY: '¥', CNY: '¥', INR: '₹',
+    BRL: 'R$', MXN: 'MXN$', SGD: 'S$', HKD: 'HK$', SEK: 'kr',
+    NOK: 'kr', DKK: 'kr', PLN: 'zł', CZK: 'Kč', HUF: 'Ft',
+    RUB: '₽', TRY: '₺', ZAR: 'R', KRW: '₩', THB: '฿',
+    MYR: 'RM', IDR: 'Rp', PHP: '₱', VND: '₫', EGP: 'E£',
+    NGN: '₦', KES: 'KSh', GHS: 'GH₵', MAD: 'MAD', TND: 'TND',
+    QAR: 'QR', SAR: 'SAR', KWD: 'KWD', BHD: 'BHD', OMR: 'OMR',
+    JOD: 'JOD', LBP: 'LBP', ILS: '₪',
+  };
+
+  return Object.keys(CURRENCY_LOCALE_MAPPING).map(currency => ({
+    value: currency,
+    label: `${currencyFlags[currency] || '🏳️'} ${currencyNames[currency] || currency} (${currencySymbols[currency] || currency})`,
+    symbol: currencySymbols[currency] || currency,
+    flag: currencyFlags[currency] || '🏳️',
+    name: currencyNames[currency] || currency,
+  }));
 }; 

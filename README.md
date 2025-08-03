@@ -34,6 +34,13 @@ Une application React moderne pour l'investissement immobilier fractionné, perm
 - **React Router 6.27.0** : Navigation
 - **Formik 2.4.6** : Gestion des formulaires
 
+### **Backend & Cloud**
+- **AWS Lambda** : Fonctions serverless
+- **AWS DynamoDB** : Base de données NoSQL
+- **AWS Cognito** : Authentification et autorisation
+- **AWS S3** : Stockage de fichiers
+- **AWS SDK v3** : Intégration AWS
+
 ### **Outils de Développement**
 - **ESLint** : Linting du code
 - **Prettier** : Formatage automatique
@@ -49,6 +56,7 @@ Une application React moderne pour l'investissement immobilier fractionné, perm
 ### **Prérequis**
 - Node.js (version 16 ou supérieure)
 - npm ou yarn
+- Compte AWS avec accès aux services Lambda, DynamoDB, Cognito, S3
 
 ### **Installation des dépendances**
 ```bash
@@ -66,10 +74,26 @@ yarn install
 ### **Configuration des variables d'environnement**
 Créer un fichier `.env` à la racine du projet :
 ```env
-REACT_APP_GOOGLE_MAPS_API_KEY=votre_clé_api_google_maps
-REACT_APP_AWS_REGION=votre_region_aws
+# AWS Configuration
+REACT_APP_AWS_REGION=eu-west-1
 REACT_APP_AWS_USER_POOLS_ID=votre_user_pool_id
 REACT_APP_AWS_USER_POOLS_WEB_CLIENT_ID=votre_client_id
+REACT_APP_AWS_IDENTITY_POOL_ID=votre_identity_pool_id
+
+# Google Maps
+REACT_APP_GOOGLE_MAPS_API_KEY=votre_clé_api_google_maps
+
+# Lambda Functions (optionnel - utilise les noms par défaut si non définis)
+REACT_APP_GET_PROPERTIES_LAMBDA=get-properties-dev
+REACT_APP_CREATE_PROPERTY_LAMBDA=create-property-dev
+REACT_APP_UPDATE_PROPERTY_LAMBDA=update-property-dev
+REACT_APP_DELETE_PROPERTY_LAMBDA=delete-property-dev
+REACT_APP_GET_PROPERTY_LAMBDA=get-property-dev
+REACT_APP_SEARCH_PROPERTIES_LAMBDA=search-properties-dev
+REACT_APP_GET_USER_PROPERTIES_LAMBDA=get-user-properties-dev
+REACT_APP_GET_PROPERTY_STATS_LAMBDA=get-property-stats-dev
+REACT_APP_UPLOAD_PROPERTY_IMAGES_LAMBDA=upload-property-images-dev
+REACT_APP_DELETE_PROPERTY_IMAGE_LAMBDA=delete-property-image-dev
 ```
 
 ## 🚀 Lancement
@@ -109,6 +133,12 @@ block-immo/
 │   │   ├── MDBox/         # Composants Material Design
 │   │   ├── forms/         # Formulaires
 │   │   └── BuySharesModal/ # Modal d'achat de parts
+│   ├── services/          # Services API et Lambda
+│   │   └── api/           # Architecture API complète
+│   │       ├── config/    # Configuration AWS et Lambda
+│   │       ├── modules/   # Services par domaine métier
+│   │       ├── utils/     # Utilitaires API
+│   │       └── examples/  # Exemples d'utilisation
 │   ├── examples/          # Exemples de composants
 │   │   ├── Charts/        # Graphiques et visualisations
 │   │   └── Cards/         # Cartes d'interface
@@ -118,9 +148,44 @@ block-immo/
 │   │   └── properties/    # Pages des propriétés
 │   ├── utils/             # Utilitaires et helpers
 │   └── App.js             # Composant principal
+├── lambda-functions/      # Fonctions AWS Lambda
+│   ├── get-properties.js  # Récupération des propriétés
+│   ├── create-property.js # Création de propriété
+│   └── utils/             # Utilitaires Lambda
 ├── package.json           # Dépendances et scripts
 └── README.md             # Documentation
 ```
+
+## 🏗️ Architecture API
+
+### **Services Lambda AWS**
+L'application utilise une architecture serverless avec AWS Lambda pour toutes les opérations backend :
+
+- **get-properties** : Récupération et filtrage des propriétés
+- **create-property** : Création de nouvelles propriétés
+- **update-property** : Mise à jour des propriétés
+- **delete-property** : Suppression de propriétés
+- **upload-property-images** : Upload d'images vers S3
+- **buy-shares** : Achat de parts d'investissement
+- **get-portfolio** : Récupération du portfolio utilisateur
+
+### **Base de Données DynamoDB**
+Structure de données optimisée pour les requêtes immobilières :
+
+```
+Table: real_estate_app
+├── PK: AGENT#agentId
+│   └── SK: PROPERTY#propertyId
+├── PK: PROPERTY#propertyId
+│   └── SK: METADATA
+└── PK: CITY#cityName
+    └── SK: PROPERTY#propertyId
+```
+
+### **Authentification AWS Cognito**
+- Gestion des utilisateurs et sessions
+- Tokens JWT sécurisés
+- Rôles et permissions
 
 ## 🎯 Fonctionnalités Clés
 
@@ -159,9 +224,12 @@ npm run install:clean # Réinstalle proprement les dépendances
 - [x] Modal d'achat de parts
 - [x] Interface de base
 - [x] Graphiques interactifs
+- [x] Architecture Lambda AWS
 
 ### **Phase 2 - Fonctionnalités Avancées** 🚧
-- [ ] Authentification utilisateur
+- [x] Authentification utilisateur (AWS Cognito)
+- [x] Gestion des propriétés (DynamoDB)
+- [x] Upload d'images (S3)
 - [ ] Portfolio personnel
 - [ ] Historique des transactions
 - [ ] Notifications en temps réel
@@ -170,7 +238,8 @@ npm run install:clean # Réinstalle proprement les dépendances
 - [ ] PWA (Progressive Web App)
 - [ ] Optimisations de performance
 - [ ] Tests automatisés
-- [ ] Documentation API
+- [ ] Documentation API complète
+- [ ] Monitoring et alertes
 
 ## 🤝 Contribution
 
@@ -184,26 +253,16 @@ npm run install:clean # Réinstalle proprement les dépendances
 ### **Standards de Code**
 - **ESLint** : Respecter les règles de linting
 - **Prettier** : Formatage automatique
-- **Conventions** : Nommage en camelCase pour les variables
-- **Documentation** : Commentaires pour les fonctions complexes
-
-## 📄 Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
-
-## 👥 Équipe
-
-- **Développeur Principal** : [Votre Nom]
-- **Design** : Material-UI + Custom Theme
-- **Architecture** : React + Modern JavaScript
+- **Architecture Lambda** : Suivre les patterns établis
+- **Tests** : Ajouter des tests pour les nouvelles fonctionnalités
 
 ## 📞 Support
 
 Pour toute question ou problème :
-- **Issues** : Utiliser les GitHub Issues
-- **Email** : [votre-email@domaine.com]
-- **Documentation** : Consulter ce README
+- **Issues GitHub** : [Créer une issue](https://github.com/souhailsouid/block-immo/issues)
+- **Documentation** : Consulter le README et les exemples
+- **AWS Services** : Vérifier la configuration des services AWS
 
----
+## 📄 Licence
 
-**Block-Immo** - Rendez l'investissement immobilier accessible à tous ! 🏠💎 
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails. 

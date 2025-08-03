@@ -20,33 +20,82 @@
   10. The `component` key is used to store the component of its route.
 */
 
-// Material Dashboard 3 PRO React layouts
+
 import Settings from 'layouts/pages/account/settings';
-
-import SignInBasic from 'layouts/authentication/sign-in/basic';
-import SignInIllustration from 'layouts/authentication/sign-in/illustration';
-
-import ResetCover from 'layouts/authentication/reset-password/cover';
-import SignUpIllustration from 'layouts/authentication/sign-up/illustration';
+import PropTypes from 'prop-types';
+import LogoutPage from 'layouts/authentication/logout';
 import MarketPlace from 'layouts/dashboards/marketPlace';
+import InvestorDashboard from 'layouts/dashboards/investor';
 import AddPropertyPage from 'layouts/pages/properties/add-property';
-import ContactRealEstate from 'layouts/realEstate/contact';
+import MyPropertiesPage from 'layouts/pages/properties/my-properties';
+
 // Material Dashboard 3 PRO React components
 import MDAvatar from 'components/MDAvatar';
+
+// Custom components
+import DiceBearAvatar from 'components/DiceBearAvatar';
 
 // @mui icons
 import Icon from '@mui/material/Icon';
 
 // Images
-import profilePicture from 'assets/images/team-3.jpg';
+import defaultProfilePicture from 'assets/images/team-3.jpg';
 
-const routes = (name) => {
+
+
+// Composant personnalisé pour l'avatar de la sidenav
+const SidenavAvatar = ({ userInfo }) => {
+  const { profilePicture, fullName } = userInfo || {};
+
+  // Fonction pour déterminer si c'est un avatar DiceBear
+  const isDiceBearAvatar = (avatarData) => {
+    return avatarData?.type === 'dicebear' || avatarData?.style;
+  };
+
+
+  // Fonction pour afficher l'avatar approprié
+  if (isDiceBearAvatar(userInfo?.userProfile?.avatar)) {
+    return (
+      <DiceBearAvatar
+        seed={userInfo?.userProfile?.avatar?.seed || 'default'}
+        style={userInfo?.userProfile?.avatar?.style || 'pixelArt'}
+        size="sm"
+        sx={{
+          border: '2px solid #fff',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        }}
+      />
+    );
+  }
+
+  return (
+    <MDAvatar 
+      src={profilePicture || defaultProfilePicture} 
+      alt={fullName || 'User'} 
+      size="sm" 
+    />
+  );
+};
+SidenavAvatar.propTypes = {
+  userInfo: PropTypes.object.isRequired,
+};
+
+const routes = (userInfo) => {
+  // Extraire les informations utilisateur
+  const firstName = userInfo?.firstName || (typeof userInfo === 'string' ? userInfo : 'User');
+  const lastName = userInfo?.lastName || '';
+  const fullName = userInfo?.fullName || `${firstName} ${lastName}`.trim();
+
+
+  // S'assurer que fullName est une chaîne
+  const displayName = typeof fullName === 'string' ? fullName : 'User';
+
   return [
     {
       type: 'collapse',
-      name: name,
-      key: 'brooklyn-alice',
-      icon: <MDAvatar src={profilePicture} alt="doisoid" size="sm" />,
+      name: displayName,
+      key: 'user-profile',
+      icon: <SidenavAvatar userInfo={userInfo} />,
       collapse: [
         {
           name: 'My Profile',
@@ -57,20 +106,71 @@ const routes = (name) => {
         {
           name: 'Logout',
           key: 'logout',
-          route: '/authentication/sign-in/basic',
-          component: <SignInBasic />,
+          route: '/logout',
+          component: <LogoutPage />,
         },
       ],
     },
     { type: 'divider', key: 'divider-0' },
     {
       type: 'collapse',
+      name: 'Account & Settings',
+      key: 'account-settings',
+      icon: <Icon fontSize="small">person</Icon>,
+      collapse: [
+        {
+          name: 'Profile Settings',
+          key: 'profile-settings',
+          route: '/pages/account/settings',
+          component: <Settings />,
+        },
+        {
+          name: 'Notifications',
+          key: 'notifications',
+          route: '/pages/notifications',
+          component: <Settings />, // On peut créer un composant Notifications plus tard
+        },
+      ],
+    },
+    {
+      type: 'collapse',
       name: 'Market Place',
       key: 'market-place',
       route: '/dashboards/market-place',
       component: <MarketPlace />,
-      icon: <Icon fontSize="small">dashboard</Icon>,
+      icon: <Icon fontSize="small">store</Icon>,
       noCollapse: true,
+    },
+
+    {
+      type: 'collapse',
+      name: 'Investment Portfolio',
+      key: 'investment-portfolio',
+      icon: <Icon fontSize="small">account_balance_wallet</Icon>,
+      collapse: [
+        {
+          name: 'My Portfolio',
+          key: 'my-portfolio',
+          route: '/investor',
+          component: <InvestorDashboard />,
+          allowedRoles: ['INVESTOR', 'ADMIN'], // 🔒 Restreint aux investisseurs
+        },
+        {
+          name: 'Investment History',
+          key: 'investment-history',
+          route: '/investor/history',
+          component: <InvestorDashboard />, // On peut créer un composant séparé plus tard
+          allowedRoles: ['INVESTOR', 'ADMIN'],
+        },
+        {
+          name: 'Performance Analytics',
+          key: 'performance-analytics',
+          route: '/investor/analytics',
+          component: <InvestorDashboard />, // On peut créer un composant séparé plus tard
+          allowedRoles: ['INVESTOR', 'ADMIN'],
+        },
+      ],
+      allowedRoles: ['INVESTOR', 'ADMIN'], // 🔒 Section entière restreinte aux investisseurs
     },
 
     {
@@ -84,66 +184,65 @@ const routes = (name) => {
           key: 'add-property',
           route: '/properties/add',
           component: <AddPropertyPage />,
+          allowedRoles: ['PROFESSIONAL', 'ADMIN'], // 🔒 Restreint aux professionnels
         },
         {
           name: 'My Properties',
           key: 'my-properties',
           route: '/properties/my-properties',
-          component: <MarketPlace />,
+          component: <MyPropertiesPage />,
+          allowedRoles: ['PROFESSIONAL', 'ADMIN'], // 🔒 Restreint aux professionnels
         },
-        {
-          name: 'Settings',
-          key: 'settings',
-          route: '/real-estate/contact',
-          component: <ContactRealEstate />,
-        },
+       
       ],
+      allowedRoles: ['PROFESSIONAL', 'ADMIN'], // 🔒 Section entière restreinte
     },
 
-    {
-      type: 'collapse',
-      name: 'Authentication',
-      key: 'authentication',
-      icon: <Icon fontSize="small">content_paste</Icon>,
-      collapse: [
-        {
-          name: 'Sign In',
-          key: 'sign-in',
-          collapse: [
-            {
-              name: 'Illustration',
-              key: 'illustration',
-              route: '/authentication/sign-in/illustration',
-              component: <SignInIllustration />,
-            },
-          ],
-        },
-        {
-          name: 'Sign Up',
-          key: 'sign-up',
-          collapse: [
-            {
-              name: 'Illustration',
-              key: 'illustration',
-              route: '/authentication/sign-up/illustration',
-              component: <SignUpIllustration />,
-            },
-          ],
-        },
-        {
-          name: 'Reset Password',
-          key: 'reset-password',
-          collapse: [
-            {
-              name: 'Cover',
-              key: 'cover',
-              route: '/authentication/reset-password/cover',
-              component: <ResetCover />,
-            },
-          ],
-        },
-      ],
-    },
+    // {
+    //   type: 'collapse',
+    //   name: 'Authentication',
+    //   key: 'authentication',
+    //   icon: <Icon fontSize="small">content_paste</Icon>,
+    //   collapse: [
+    //     {
+    //       name: 'Sign In',
+    //       key: 'sign-in',
+    //       collapse: [
+    //         {
+    //           name: 'Illustration',
+    //           key: 'illustration',
+    //           route: '/authentication/sign-in/illustration',
+    //           component: <SignInIllustration />,
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       name: 'Sign Up',
+    //       key: 'sign-up',
+    //       collapse: [
+    //         {
+    //           name: 'Illustration',
+    //           key: 'illustration',
+    //           route: '/authentication/sign-up/illustration',
+    //           component: <SignUpIllustration />,
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       name: 'Reset Password',
+    //       key: 'reset-password',
+    //       collapse: [
+    //         {
+    //           name: 'Cover',
+    //           key: 'cover',
+    //           route: '/authentication/reset-password/cover',
+    //           component: <ResetCover />,
+    //         },
+    //       ],
+    //     },
+       
+    //   ],
+    // },
   ];
 };
 

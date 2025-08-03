@@ -9,11 +9,6 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
-// Material Dashboard 2 React example components
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
-
 // Authentication layout components
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 
@@ -117,6 +112,20 @@ const Cover = () => {
               </MDButton>
             </MDBox>
             <MDBox mt={3} mb={1} textAlign="center">
+            {/*  forgot password */}
+            <MDTypography variant="button" color="text">
+              <MDTypography
+                component="a"
+                href="#"
+                variant="button"
+                color="info"
+                fontWeight="medium"
+                textGradient
+              >
+                Forgot password?
+              </MDTypography>
+              </MDTypography>
+              
               <MDTypography variant="button" color="text">
                 Don&apos;t have an account?{" "}
                 <MDTypography

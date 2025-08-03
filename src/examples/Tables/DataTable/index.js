@@ -24,7 +24,7 @@ import MDPagination from "components/MDPagination";
 import DataTableHeadCell from "examples/Tables/DataTable/DataTableHeadCell";
 import DataTableBodyCell from "examples/Tables/DataTable/DataTableBodyCell";
 
-function DataTable({
+const DataTable = ({
   entriesPerPage = { defaultValue: 10, entries: [5, 10, 15, 20, 25] },
   canSearch = false,
   showTotalEntries = true,
@@ -32,7 +32,7 @@ function DataTable({
   pagination = { variant: "gradient", color: "info" },
   isSorted = true,
   noEndBorder = false,
-}) {
+}) => {
   const defaultValue = entriesPerPage.defaultValue ? entriesPerPage.defaultValue : 10;
   const entries = entriesPerPage.entries
     ? entriesPerPage.entries.map((el) => el.toString())

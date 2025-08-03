@@ -33,9 +33,15 @@ import {
   setWhiteSidenav,
 } from "context";
 
+// Route filtering utilities
+import { filterRoutesByStoredRole } from "utils/routeUtils";
+
+// User profile hook
+import { useUserProfile } from "hooks/useUserProfile";
+
 import blocktechLogo from "assets/images/logos/blocktech_logo.png";
 
-const Sidenav = ({ color = "info", brand = "", routes, username,  ...rest }) => {
+const Sidenav = ({ color = "info", brand = "", routes, ...rest }) => {
 
   const [openCollapse, setOpenCollapse] = useState(false);
   const [openNestedCollapse, setOpenNestedCollapse] = useState(false);
@@ -48,6 +54,17 @@ const Sidenav = ({ color = "info", brand = "", routes, username,  ...rest }) => 
   const items = pathname.split("/").slice(1);
   const itemParentName = items[1];
   const itemName = items[items.length - 1];
+
+  // Récupérer les informations utilisateur
+  const { 
+    userProfile, 
+    isLoading: profileLoading, 
+    firstName, 
+    lastName, 
+    fullName, 
+    profilePicture,
+    primaryRole 
+  } = useUserProfile();
 
   let textColor = "white";
 
@@ -155,8 +172,18 @@ const Sidenav = ({ color = "info", brand = "", routes, username,  ...rest }) => 
       return <SidenavList key={key}>{returnValue}</SidenavList>;
     });
 
+  // Filtrer les routes en fonction du rôle de l'utilisateur
+  const filteredRoutes = filterRoutesByStoredRole(routes({
+    firstName,
+    lastName,
+    fullName,
+    profilePicture,
+    primaryRole,
+    userProfile
+  }));
+
   // Render all the routes from the routes.js (All the visible items on the Sidenav)
-  const renderRoutes = routes(username).map(
+  const renderRoutes = filteredRoutes.map(
     ({ type, name, icon, title, collapse, noCollapse, key, href, route }) => {
       let returnValue;
       if (type === "collapse") {
@@ -198,8 +225,9 @@ const Sidenav = ({ color = "info", brand = "", routes, username,  ...rest }) => 
               icon={icon}
               active={key === collapseName}
               open={openCollapse === key}
-              onClick={() =>
-                openCollapse === key
+              onClick={({ currentTarget }) =>
+                openCollapse === key &&
+                currentTarget.classList.contains("MuiListItem-root")
                   ? setOpenCollapse(false)
                   : setOpenCollapse(key)
               }
@@ -212,29 +240,19 @@ const Sidenav = ({ color = "info", brand = "", routes, username,  ...rest }) => 
         returnValue = (
           <MDTypography
             key={key}
-            color={textColor}
             display="block"
             variant="caption"
             fontWeight="bold"
             textTransform="uppercase"
-            pl={2}
-            mt={2}
-            mb={1}
-            ml={1}
+            color={textColor}
+            px={2}
+            py={1}
           >
             {title}
           </MDTypography>
         );
       } else if (type === "divider") {
-        returnValue = (
-          <Divider
-            key={key}
-            light={
-              (!darkMode && !whiteSidenav && !transparentSidenav) ||
-              (darkMode && !transparentSidenav && whiteSidenav)
-            }
-          />
-        );
+        returnValue = <Divider key={key} light />;
       }
 
       return returnValue;
@@ -242,12 +260,8 @@ const Sidenav = ({ color = "info", brand = "", routes, username,  ...rest }) => 
   );
 
   return (
-    <SidenavRoot
-      {...rest}
-      variant="permanent"
-      ownerState={{ transparentSidenav, whiteSidenav, miniSidenav, darkMode }}
-    >
-      <MDBox pt={2.5} pb={0} px={3} textAlign="center">
+    <SidenavRoot variant="permanent" ownerState={{ transparentSidenav, whiteSidenav, miniSidenav, darkMode }}>
+      <MDBox pt={3} pb={1} px={4} textAlign="center">
         <MDBox
           display={{ xs: "block", xl: "none" }}
           position="absolute"
@@ -261,34 +275,15 @@ const Sidenav = ({ color = "info", brand = "", routes, username,  ...rest }) => 
             <Icon sx={{ fontWeight: "bold" }}>close</Icon>
           </MDTypography>
         </MDBox>
-        <MDBox component={NavLink} to="/" display="flex" alignItems="center">
-          {brand && (
-            <MDBox component="img" src={blocktechLogo} alt="Brand"  width="100%" mr={2}/>
-          )}
-          <MDBox
-            width="100%"
-            sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
-          >
-            <MDTypography
-              component="h6"
-              variant="button"
-              fontWeight="regular"
-              color={textColor}
-            >
-            </MDTypography>
-          </MDBox>
-        </MDBox>
+        <MDBox component={brand === "noble" ? "img" : "hr"} src={blocktechLogo} alt="Brand" width="30%" />
       </MDBox>
-      <Divider
-        light={
-          (!darkMode && !whiteSidenav && !transparentSidenav) ||
-          (darkMode && !transparentSidenav && whiteSidenav)
-        }
-      />
+      <Divider light />
       <List>{renderRoutes}</List>
     </SidenavRoot>
   );
-}
+};
+
+
 
 // Typechecking props for the Sidenav
 Sidenav.propTypes = {
@@ -300,9 +295,13 @@ Sidenav.propTypes = {
     "warning",
     "error",
     "dark",
+    "light",
   ]),
   brand: PropTypes.string,
+  brandName: PropTypes.string.isRequired,
   routes: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onMouseEnter: PropTypes.func,
+  onMouseLeave: PropTypes.func,
 };
 
 export default Sidenav;

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-
+import PropTypes from 'prop-types';
 // @mui material components
 import Grid from '@mui/material/Grid';
 
@@ -9,18 +9,18 @@ import MDBox from 'components/MDBox';
 // Material Dashboard 3 PRO React 
 import VerticalBarChart from 'examples/Charts/BarCharts/VerticalBarChart';
 
-// Data
-import calculatorInvestmentsBarChartData from 'layouts/pages/charts/data/verticalBarChartData';
 
 import CalculatorInvestmentsSlider from 'layouts/pages/charts/CalculatorInvestmentsSlider';
 
+const CalculatorInvestmentsCharts = ({ property }) => {
 
-const CalculatorInvestmentsCharts = () => {
   const [initialInvestment, setInitialInvestment] = useState(
-    calculatorInvestmentsBarChartData.initialInvestment
+    property.propertyPrice
+    
   );
   const [appreciationValue, setAppreciationValue] = useState(20);
-  const [expectedAnnualRentalYield, setExpectedAnnualRentalYield] = useState(3.9);
+  const [expectedAnnualRentalYield, setExpectedAnnualRentalYield] = useState(property.yearlyInvestmentReturn || 3.9
+    );
 
   // Calculer les résultats en temps réel
   const totalRentalIncome = useMemo(() => {
@@ -35,9 +35,11 @@ const CalculatorInvestmentsCharts = () => {
     return initialInvestment + totalRentalIncome + totalAppreciation;
   }, [initialInvestment, totalRentalIncome, totalAppreciation]);
 
+  const getCurrentYear = new Date().getFullYear();
+  
   const chartData = useMemo(
     () => ({
-      labels: ['2026', '2027', '2028', '2029', '2030'],
+      labels: [getCurrentYear, '2027', '2028', '2029', '2030'],
       datasets: [
         {
           label: 'Investment return',
@@ -103,5 +105,10 @@ const CalculatorInvestmentsCharts = () => {
     </MDBox>
   );
 }
+
+CalculatorInvestmentsCharts.propTypes = {
+  property: PropTypes.object.isRequired,
+};
+
 
 export default CalculatorInvestmentsCharts;

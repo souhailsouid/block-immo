@@ -92,7 +92,6 @@ const SidenavCollapse = ({
   );
 }
 
-
 // Typechecking props for the SidenavCollapse
 SidenavCollapse.propTypes = {
   icon: PropTypes.node.isRequired,

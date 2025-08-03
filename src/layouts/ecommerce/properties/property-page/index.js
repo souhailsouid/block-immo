@@ -13,9 +13,16 @@ import DashboardKYC from 'examples/Navbars/DashboardKYC';
 
 // Data
 import PropertiesPreviews from 'layouts/ecommerce/properties/property-page/components/Properties/PropertiesPreviews';
-import PropertyDetails from 'layouts/dashboards/marketPlace/components/PropertyDetails';
 
+import PropertyDetails from 'layouts/dashboards/marketPlace/components/PropertyDetails';
+import { useParams } from 'react-router-dom';
 const PropertyPage = () => {
+  // Récupérer l'ID de la propriété depuis l'URL
+  const { propertyId } = useParams();
+
+  // Si pas d'ID dans l'URL, utiliser une valeur par défaut ou rediriger
+  const finalPropertyId = propertyId || 1; // Valeur par défaut pour les tests
+
   return (
     <DashboardLayout>
       <DashboardKYC />
@@ -24,15 +31,17 @@ const PropertyPage = () => {
         <Card sx={{ overflow: 'visible' }}>
           <MDBox p={3}>
             <Grid container>
-              <PropertiesPreviews propertyId={1} />
+
+              <PropertiesPreviews propertyId={finalPropertyId} />
 
               <Box sx={{ flexGrow: 1, px: 2, cursor: 'pointer' }}>
                 <Grid container>
                   <Grid item xs={12} md={6} lg={12}>
-                    <PropertyDetails />
+                    <PropertyDetails propertyId={finalPropertyId} />
                   </Grid>
                 </Grid>
               </Box>
+
             </Grid>
           </MDBox>
         </Card>

@@ -11,8 +11,6 @@ import MDTypography from 'components/MDTypography';
 // NewUser page components
 import FormField from 'layouts/pages/users/new-user/components/FormField';
 
-
-
 const Address = ({ formData }) => {
   const { values, touched, formField, errors, setValues } = formData;
 

@@ -16,15 +16,15 @@ const LocationCascadeSelect = ({
   cityField = 'city',
   showState = true,
 }) => {
-  const { values } = useFormikContext();
+  const { values, setFieldValue } = useFormikContext();
   const countries = getAllCountries();
   const [stateOptions, setStateOptions] = useState([]);
   const [cityOptions, setCityOptions] = useState([]);
 
   // Initialize state options if country is already selected
   const getCountryCode = () => {
-    const country = countries.find((country) => country.value === values.country);
-    return country.code;
+    const country = countries?.find((country) => country.value === values.country);
+    return country?.code;
   };
 
   useEffect(() => {
@@ -50,6 +50,22 @@ const LocationCascadeSelect = ({
       setCityOptions([]);
     }
   }, [values.country, values.state]);
+
+  // Corriger la casse de la ville si nécessaire
+  useEffect(() => {
+    if (values[cityField] && cityOptions.length > 0) {
+      const cityValue = values[cityField];
+      const matchingCity = cityOptions.find(option => 
+        option.value.toLowerCase() === cityValue.toLowerCase()
+      );
+      
+      if (matchingCity && matchingCity.value !== cityValue) {
+        // Mettre à jour avec la bonne casse
+        setFieldValue(cityField, matchingCity.value);
+      }
+    }
+  }, [cityOptions, values[cityField], cityField, setFieldValue]);
+
   return (
     <MDBox>
       <FormFieldSelect
@@ -61,21 +77,29 @@ const LocationCascadeSelect = ({
 
       {showState && (
         <FormFieldSelect
+          key={stateField}
           label="State/Region"
           name={stateField}
           options={stateOptions}
           placeholder="Select State/Region"
         />
       )}
+      
       {cityOptions.length > 0 ? (
         <FormFieldSelect
+          key={cityField}
           label="City"
           name={cityField}
           options={cityOptions}
           placeholder="Select City"
         />
       ) : (
-        <FormField label="City" name={cityField} placeholder="Enter City" />
+        <FormField 
+          label="City" 
+          name={cityField} 
+          key={cityField} 
+          placeholder="Enter City" 
+        />
       )}
     </MDBox>
   );

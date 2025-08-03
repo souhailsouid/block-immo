@@ -13,7 +13,7 @@ import MDTypography from "components/MDTypography";
 import pattern from "assets/images/illustrations/pattern-tree.svg";
 import masterCardLogo from "assets/images/logos/mastercard.png";
 
-function MasterCard({ color = "dark", number, holder, expires }) {
+const MasterCard = ({ color = "dark", number, holder, expires }) => {
   const numbers = [...`${number}`];
 
   if (numbers.length < 16 || numbers.length > 16) {
@@ -22,10 +22,10 @@ function MasterCard({ color = "dark", number, holder, expires }) {
     );
   }
 
-  const num1 = numbers.slice(0, 4).join("");
-  const num2 = numbers.slice(4, 8).join("");
-  const num3 = numbers.slice(8, 12).join("");
-  const num4 = numbers.slice(12, 16).join("");
+  const num1 = numbers.slice(0, 4).join("").substring(0, 1) + "XXX";
+  const num2 = numbers.slice(4, 8).join("").substring(4, 8) + "XXX";
+  const num3 = numbers.slice(8, 12).join("").substring(8, 12) + "XXX";
+  const num4 = numbers.slice(12, 16).join("").substring(12, 16) + "XXX";
 
   return (
     <Card

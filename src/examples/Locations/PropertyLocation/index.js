@@ -16,7 +16,7 @@ const PropertyLocation = ({ city, country, address, description, lat, lng }) => 
             <MDBox
               width="2.25rem"
               height="2.25rem"
-              bgColor={'customBlue'}
+              bgColor={'info'}
               variant="gradient"
               borderRadius="xl"
               display="flex"
@@ -52,11 +52,13 @@ const PropertyLocation = ({ city, country, address, description, lat, lng }) => 
   );
 };
 
-PropertyLocation.defaultProps = {
+PropertyLocation.propTypes = {
   city: PropTypes.string,
   country: PropTypes.string,
   address: PropTypes.string,
   description: PropTypes.string,
+  lat: PropTypes.number,
+  lng: PropTypes.number,
 };
 
 export default PropertyLocation;

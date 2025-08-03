@@ -1,0 +1,577 @@
+service: block-immo-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-west-3
+  stage: ${opt:stage, 'dev'}
+
+  apiGateway:
+    binaryMediaTypes:
+      - "multipart/form-data"
+      - "image/*"
+
+
+  environment:
+    USER_POOL_ID: eu-west-3_mNgps2u4O
+    CLIENT_ID: 19j4bu74qppk83kf3sfhui24hq
+    S3_BUCKET_NAME: block-immo-images
+    DYNAMODB_TABLE: real_estate_app
+    INVESTMENTS_TABLE: ${self:service}-investments-${self:provider.stage}
+    TRANSACTIONS_TABLE: ${self:service}-transactions-${self:provider.stage}
+
+  iamRoleStatements:
+    # ✅ PERMISSIONS DYNAMODB EXISTANTES
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/real_estate_app"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-investments-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-transactions-${self:provider.stage}"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-investments-${self:provider.stage}/index/*"
+        - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:service}-transactions-${self:provider.stage}/index/*"
+
+      # ✅ PERMISSIONS S3 EXISTANTES (GÉNÉRALES)
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+        - s3:DeleteObject
+      Resource:
+        - "arn:aws:s3:::block-immo-images/property-photos/*"
+    
+    # ✅ PERMISSION S3 POUR LISTER LES OBJETS (GET PHOTOS)
+    - Effect: Allow
+      Action:
+        - s3:ListBucket
+      Resource:
+        - "arn:aws:s3:::block-immo-images"
+
+          # ✅ NOUVELLES PERMISSIONS S3 SÉCURISÉES POUR L'UPLOAD
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:PutObjectAcl
+      Resource:
+        - "arn:aws:s3:::block-immo-images/property-photos/*"
+      Condition:
+        StringEquals:
+          "s3:x-amz-acl": ["private", "public-read"] # ✅ SUPPORT PRIVATE ET PUBLIC
+        NumericLessThan:
+          "s3:content-length": "10485760" # ✅ LIMITE 10MB
+
+        # ✅ PERMISSIONS COGNITO EXISTANTES
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminGetUser
+        - cognito-idp:AdminInitiateAuth
+        - cognito-idp:AdminRespondToAuthChallenge
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+        - cognito-idp:AdminListGroupsForUser
+      Resource:
+        - "arn:aws:cognito-idp:${self:provider.region}:*:userpool/eu-west-3_mNgps2u4O"
+
+package:
+  exclude:
+    - node_modules/**
+    - src/**
+    - public/**
+    - .git/**
+    - .vscode/**
+    - .env*
+    - .prettier*
+    - eslint.config.mjs
+    - jsconfig.json
+    - package-lock.json
+    - ts.ts
+
+  include:
+    - node_modules/aws-jwt-verify/**
+    - node_modules/countries-list/**
+    - node_modules/parse-multipart/**
+    - node_modules/busboy/**
+    - node_modules/streamsearch/**
+    - node_modules/uuid/**
+
+functions:
+  # GET /properties - Liste toutes les propriétés
+  get-properties:
+    handler: handlers/get-properties.handler
+    events:
+      - http:
+          path: /properties
+          method: get
+          cors: true
+
+  # GET /properties/{id} - Récupère une propriété spécifique
+  get-property:
+    handler: handlers/get-property.handler
+    events:
+      - http:
+          path: /properties/{id}
+          method: get
+          cors: true
+
+
+
+  # PUT /properties/{id} - Modifie une propriété
+  update-property:
+    handler: handlers/update-property.handler
+    events:
+      - http:
+          path: /properties/{id}
+          method: put
+          cors: true
+
+  # PUT /properties/{id}/table - Modifie les détails de la table d'une propriété
+  update-property-table:
+    handler: handlers/update-property-table.handler
+    events:
+      - http:
+          path: /properties/{id}/table
+          method: put
+          cors: true
+
+  # PUT /properties/{id}/timeline - Modifie la timeline d'une propriété
+  update-property-timeline:
+    handler: handlers/update-property-timeline.handler
+    events:
+      - http:
+          path: /properties/{id}/timeline
+          method: put
+          cors: true
+
+  # PUT /properties/{id}/location - Modifie la localisation d'une propriété
+  update-property-location:
+    handler: handlers/update-property-location.handler
+    events:
+      - http:
+          path: /properties/{id}/location
+          method: put
+          cors: true
+
+  # PUT /properties/{id}/price - Modifie le prix d'une propriété
+  update-property-price:
+    handler: handlers/update-property-price.handler
+    events:
+      - http:
+          path: /properties/{id}/price
+          method: put
+          cors: true
+
+  # GET /user/profile - Récupère le profil utilisateur
+  get-user-profile:
+    handler: handlers/get-user-profile.handler
+    events:
+      - http:
+          path: /user/profile
+          method: get
+          cors: true
+
+  # PUT /user/profile - Met à jour le profil utilisateur
+  update-user-profile:
+    handler: handlers/update-user-profile.handler
+    events:
+      - http:
+          path: /user/profile
+          method: put
+          cors: true
+
+  # Lambda pour ajouter les custom claims (appelée par Cognito)
+  add-custom-claims:
+    handler: handlers/add-custom-claims.handler
+
+  # Lambda pour vérifier les rôles (sécurisée côté serveur)
+  verify-roles:
+    handler: handlers/verify-roles-secure.handler
+    events:
+      - http:
+          path: /auth/verify-roles
+          method: get
+          cors: true
+  # Add this to the functions section in serverless.yml
+  # PUT /user/fractional-profile - Update fractional professional profile
+  update-fractional-profile:
+    handler: handlers/update-fractional-profile.handler
+    events:
+      - http:
+          path: /user/fractional-profile
+          method: put
+          cors: true
+
+  get-fractional-profile:
+    handler: handlers/get-fractional-profile.handler
+    events:
+      - http:
+          path: /user/fractional-profile
+          method: get
+          cors: true
+
+  # lambda-functions/serverless.yml
+  # ... (dans la section functions)
+
+  # 📸 PHOTOS API - REST COMPLET
+  
+  # GET /properties/{id}/photos - Lister les photos (URLs publiques)
+  get-property-photos:
+    handler: handlers/get-property-photos.handler
+    events:
+      - http:
+          path: /properties/{id}/photos
+          method: GET
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+  # GET /properties/{id}/photos/signed - Lister les photos avec URLs signées (SÉCURISÉ)
+  get-property-photos-signed:
+    handler: handlers/get-property-photos-signed.handler
+    events:
+      - http:
+          path: /properties/{id}/photos/signed
+          method: GET
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+  # POST /properties/{id}/photos - Ajouter une photo
+  upload-property-photo:  
+    handler: handlers/upload-property-photo.handler
+    events:
+      - http:
+          path: /properties/{id}/photos
+          method: POST
+          cors:
+            origin: '*'
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
+          request:
+            parameters:
+              paths:
+                id: true
+
+  # PUT /properties/{id}/photos/manage - Gestion unifiée des photos (ajout, suppression, réorganisation)
+  manage-property-photos:
+    handler: handlers/manage-property-photos.handler
+    timeout: 30
+    memorySize: 1024
+    events:
+      - http:
+          path: /properties/{id}/photos/manage
+          method: PUT
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+  # DELETE /properties/{id}/photos - Supprimer une photo (photoUrl dans le body)
+  delete-property-photo:
+    handler: handlers/delete-photo.handler
+    events:
+      - http:
+          path: /properties/{id}/photos
+          method: DELETE
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+  # 💰 INVESTMENT API - NOUVELLES FONCTIONS
+  
+  # POST /investments/buy-shares - Acheter des parts d'une propriété
+  buy-shares:
+    handler: handlers/buy-shares.handler
+    events:
+      - http:
+          path: /investments/buy-shares
+          method: POST
+          cors: true
+
+  # GET /investments/portfolio - Récupérer le portfolio de l'investisseur
+  get-portfolio:
+    handler: handlers/get-portfolio.handler
+    events:
+      - http:
+          path: /investments/portfolio
+          method: GET
+          cors: true
+
+  # POST /properties - Créer une nouvelle propriété
+  create-property:
+    handler: handlers/create-property.handler
+    timeout: 30
+    memorySize: 1024
+    events:
+      - http:
+          path: /properties
+          method: POST
+          cors: true
+
+  # DELETE /properties/{id} - Supprimer une propriété
+  delete-property:
+    handler: handlers/delete-property.handler
+    timeout: 30
+    memorySize: 1024
+    events:
+      - http:
+          path: /properties/{id}
+          method: DELETE
+          cors: true
+
+  # PUT /properties/{id}/status - Mettre à jour le statut d'une propriété
+  update-property-status:
+    handler: handlers/update-property-status.handler
+    timeout: 30
+    memorySize: 1024
+    events:
+      - http:
+          path: /properties/{id}/status
+          method: PUT
+          cors: true
+
+
+resources:
+  Resources:
+    # Identity Pool pour gérer les rôles personnalisés
+    CognitoIdentityPool:
+      Type: AWS::Cognito::IdentityPool
+      Properties:
+        IdentityPoolName: block-immo-identity-pool-${self:provider.stage}
+        AllowUnauthenticatedIdentities: false
+        CognitoIdentityProviders:
+          - ClientId: ${self:provider.environment.CLIENT_ID}
+            ProviderName: cognito-idp.${self:provider.region}.amazonaws.com/${self:provider.environment.USER_POOL_ID}
+            ServerSideTokenCheck: true
+
+    # Rôles IAM pour l'Identity Pool
+    CognitoIdentityPoolRoleUnauth:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: block-immo-identity-pool-role-unauthenticated-${self:provider.stage}
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Federated: cognito-identity.amazonaws.com
+              Action: sts:AssumeRoleWithWebIdentity
+              Condition:
+                StringEquals:
+                  "cognito-identity.amazonaws.com:aud": !Ref CognitoIdentityPool
+                "ForAnyValue:StringLike":
+                  "cognito-identity.amazonaws.com:amr": unauthenticated
+        Policies:
+          - PolicyName: block-immo-unauthenticated-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - mobileanalytics:PutEvents
+                    - cognito-sync:*
+                  Resource: "*"
+
+    CognitoIdentityPoolRoleAuth:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: block-immo-identity-pool-role-authenticated-${self:provider.stage}
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Federated: cognito-identity.amazonaws.com
+              Action: sts:AssumeRoleWithWebIdentity
+              Condition:
+                StringEquals:
+                  "cognito-identity.amazonaws.com:aud": !Ref CognitoIdentityPool
+                "ForAnyValue:StringLike":
+                  "cognito-identity.amazonaws.com:amr": authenticated
+        Policies:
+          - PolicyName: block-immo-authenticated-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - mobileanalytics:PutEvents
+                    - cognito-sync:*
+                    - dynamodb:GetItem
+                    - dynamodb:PutItem
+                    - dynamodb:UpdateItem
+                    - dynamodb:DeleteItem
+                    - dynamodb:Query
+                    - dynamodb:Scan
+                  Resource:
+                    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+    # Attachement des rôles à l'Identity Pool
+    CognitoIdentityPoolRoleAttachment:
+      Type: AWS::Cognito::IdentityPoolRoleAttachment
+      Properties:
+        IdentityPoolId: !Ref CognitoIdentityPool
+        Roles:
+          unauthenticated: !GetAtt CognitoIdentityPoolRoleUnauth.Arn
+          authenticated: !GetAtt CognitoIdentityPoolRoleAuth.Arn
+
+    # Table des investissements
+    InvestmentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-investments-${self:provider.stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
+            AttributeType: S
+          - AttributeName: GSI2PK
+            AttributeType: S
+          - AttributeName: GSI2SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: GSI2
+            KeySchema:
+              - AttributeName: GSI2PK
+                KeyType: HASH
+              - AttributeName: GSI2SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Service
+            Value: ${self:service}
+
+    # Table des transactions
+    TransactionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-transactions-${self:provider.stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
+            AttributeType: S
+          - AttributeName: GSI2PK
+            AttributeType: S
+          - AttributeName: GSI2SK
+            AttributeType: S
+          - AttributeName: GSI3PK
+            AttributeType: S
+          - AttributeName: GSI3SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: GSI2
+            KeySchema:
+              - AttributeName: GSI2PK
+                KeyType: HASH
+              - AttributeName: GSI2SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: GSI3
+            KeySchema:
+              - AttributeName: GSI3PK
+                KeyType: HASH
+              - AttributeName: GSI3SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Environment
+            Value: ${self:provider.stage}
+          - Key: Service
+            Value: ${self:service}
+
+    # Politique IAM pour les Lambda functions
+    LambdaExecutionRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:service}-lambda-execution-${self:provider.stage}
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        Policies:
+          - PolicyName: DynamoDBAccess
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:GetItem
+                    - dynamodb:PutItem
+                    - dynamodb:UpdateItem
+                    - dynamodb:DeleteItem
+                    - dynamodb:Query
+                    - dynamodb:Scan
+                  Resource:
+                    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+                    - !GetAtt InvestmentsTable.Arn
+                    - !GetAtt TransactionsTable.Arn
+                    - !Sub "${InvestmentsTable.Arn}/index/*"
+                    - !Sub "${TransactionsTable.Arn}/index/*"
+
+plugins:
+  - serverless-dotenv-plugin

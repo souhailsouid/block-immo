@@ -1,33 +1,53 @@
 import PropTypes from 'prop-types';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import MDBox from 'components/MDBox';
 import MDButton from 'components/MDButton';
-import { Grid, Card, Typography, IconButton, Box } from '@mui/material';
-import {  Delete, CloudUpload } from '@mui/icons-material';
+import { Grid, Card, Typography, IconButton, Box, CircularProgress } from '@mui/material';
+import { Delete, CloudUpload } from '@mui/icons-material';
 
-const PhotoUploadManager = ({ onPhotosChange }) => {
-  const [uploadedPhotos, setUploadedPhotos] = useState([]);
+const PhotoUploadManager = ({ onPhotosChange, propertyId, currentPhotos = [] }) => {
+  const [photos, setPhotos] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const fileInputRef = useRef(null);
 
-  const handleFileSelect = (event) => {
+  // Mettre à jour les photos quand currentPhotos change
+  useEffect(() => {
+    setPhotos(currentPhotos || []);
+  }, [currentPhotos]);
+
+  const handleFileSelect = async (event) => {
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
-      const photoData = {
-        id: Date.now() + Math.random(),
-        name: file.name,
-        // eslint-disable-next-line no-undef
-        url: URL.createObjectURL(file),
-        size: file.size,
-        type: file.type,
-        file: file,
-        uploadedAt: new Date().toISOString(),
-      };
+      try {
+        setIsUploading(true);
+        
+        // Créer une URL temporaire pour prévisualisation
+        const tempUrl = window.URL.createObjectURL(file);
+        
+        const photoData = {
+          id: `new_${Date.now()}_${Math.random()}`,
+          fileName: file.name,
+          src: tempUrl,
+          size: file.size,
+          type: file.type,
+          uploadedAt: new Date().toISOString(),
+          isNew: true,
+          file: file, // Garder le fichier pour upload plus tard
+          status: 'pending' // Status pour différencier les photos
+        };
 
-      setUploadedPhotos(prev => [...prev, photoData]);
-      
-      // Notifier le composant parent
-      if (onPhotosChange) {
-        onPhotosChange([...uploadedPhotos, photoData]);
+        const newPhotos = [...photos, photoData];
+        setPhotos(newPhotos);
+        
+        // Notifier le composant parent
+        if (onPhotosChange) {
+          onPhotosChange(newPhotos);
+        }
+      } catch (error) {
+        // Erreur silencieuse pour la prévisualisation
+      } finally {
+        setIsUploading(false);
       }
     }
     
@@ -36,17 +56,30 @@ const PhotoUploadManager = ({ onPhotosChange }) => {
   };
 
   const handleDeletePhoto = (photoId) => {
-    const updatedPhotos = uploadedPhotos.filter(photo => photo.id !== photoId);
-    setUploadedPhotos(updatedPhotos);
-    
-    // Notifier le composant parent
-    if (onPhotosChange) {
-      onPhotosChange(updatedPhotos);
+    try {
+      setIsDeleting(true);
+      
+      // Supprimer par id ou key ou index si nécessaire
+      const updatedPhotos = photos.filter((photo, index) => {
+        const photoIdentifier = photo.id || photo.key || `photo_${index}`;
+        return photoIdentifier !== photoId;
+      });
+      
+      setPhotos(updatedPhotos);
+      
+      // Notifier le composant parent
+      if (onPhotosChange) {
+        onPhotosChange(updatedPhotos);
+      }
+    } catch (error) {
+      // Erreur silencieuse pour la suppression
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   const handleClearAll = () => {
-    setUploadedPhotos([]);
+    setPhotos([]);
     
     // Notifier le composant parent
     if (onPhotosChange) {
@@ -63,8 +96,9 @@ const PhotoUploadManager = ({ onPhotosChange }) => {
             variant="outlined"
             color="customBlue"
             size="large"
-            startIcon={<CloudUpload />}
+            startIcon={isUploading ? <CircularProgress size={20} /> : <CloudUpload />}
             onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
             sx={{
               minWidth: 200,
               height: 60,
@@ -73,7 +107,7 @@ const PhotoUploadManager = ({ onPhotosChange }) => {
               borderWidth: 2,
             }}
           >
-            📸 Click to select a photo
+            {isUploading ? '📤 Uploading...' : '📸 Click to select a photo'}
           </MDButton>
           
           {/* Input file caché */}
@@ -94,12 +128,12 @@ const PhotoUploadManager = ({ onPhotosChange }) => {
         </MDBox>
       </Card>
 
-      {/* Galerie des photos */}
-      {uploadedPhotos.length > 0 && (
+      {/* Toutes les photos dans une seule grille */}
+      {photos.length > 0 && (
         <Card sx={{ p: 3 }}>
           <MDBox display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h6">
-              🖼️ Selected Photos ({uploadedPhotos.length})
+              📷 Photos ({photos.length})
             </Typography>
             <MDButton
               variant="outlined"
@@ -112,13 +146,13 @@ const PhotoUploadManager = ({ onPhotosChange }) => {
           </MDBox>
           
           <Grid container spacing={2}>
-            {uploadedPhotos.map((photo) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={photo.id}>
+            {photos.map((photo, index) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={photo.id || photo.key || `photo_${index}`}>
                 <Card sx={{ p: 2, position: 'relative' }}>
                   <Box
                     component="img"
-                    src={photo.url}
-                    alt={photo.name}
+                    src={photo.src || photo.url}
+                    alt={photo.label || photo.fileName || `Photo ${index + 1}`}
                     sx={{
                       width: '100%',
                       height: 150,
@@ -129,17 +163,40 @@ const PhotoUploadManager = ({ onPhotosChange }) => {
                   />
                   
                   <Typography variant="caption" display="block" noWrap>
-                    {photo.name}
+                    {photo.label || photo.fileName || `Photo ${index + 1}`}
                   </Typography>
                   
-                  <Typography variant="caption" color="textSecondary">
-                    {(photo.size / 1024 / 1024).toFixed(1)} MB
-                  </Typography>
+                  {photo.size && (
+                    <Typography variant="caption" color="textSecondary">
+                      {(photo.size / 1024 / 1024).toFixed(1)} MB
+                    </Typography>
+                  )}
+                  
+                  {/* Badge pour les nouvelles photos */}
+                  {photo.isNew && (
+                    <MDBox
+                      sx={{
+                        position: 'absolute',
+                        top: 8,
+                        left: 8,
+                        backgroundColor: '#4caf50',
+                        color: 'white',
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 1,
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      NEW
+                    </MDBox>
+                  )}
                   
                   {/* Bouton de suppression */}
                   <IconButton
                     size="small"
-                    onClick={() => handleDeletePhoto(photo.id)}
+                    onClick={() => handleDeletePhoto(photo.id || photo.key)}
+                    disabled={isDeleting}
                     color="error"
                     sx={{
                       position: 'absolute',
@@ -151,7 +208,7 @@ const PhotoUploadManager = ({ onPhotosChange }) => {
                       }
                     }}
                   >
-                    <Delete />
+                    {isDeleting ? <CircularProgress size={16} /> : <Delete />}
                   </IconButton>
                 </Card>
               </Grid>
@@ -165,6 +222,8 @@ const PhotoUploadManager = ({ onPhotosChange }) => {
 
 PhotoUploadManager.propTypes = {
   onPhotosChange: PropTypes.func.isRequired,
+  propertyId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  currentPhotos: PropTypes.array,
 };
 
 export default PhotoUploadManager; 

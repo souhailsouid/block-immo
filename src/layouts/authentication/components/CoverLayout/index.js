@@ -18,14 +18,14 @@ import Footer from "layouts/authentication/components/Footer";
 // Material Dashboard 3 PRO React page layout routes
 import pageRoutes from "page.routes";
 
-function CoverLayout({ coverHeight = "35vh", image, children }) {
+const CoverLayout = ({ coverHeight = "35vh", image, children }) => {
   return (
     <PageLayout>
       <DefaultNavbar
         routes={pageRoutes}
         action={{
           type: "external",
-          route: "https://creative-tim.com/product/material-dashboard-pro-react",
+          route: "https://souhailsouid.vercel.app/",
           label: "buy now",
         }}
         transparent
@@ -58,7 +58,7 @@ function CoverLayout({ coverHeight = "35vh", image, children }) {
           </Grid>
         </Grid>
       </MDBox>
-      <Footer />
+
     </PageLayout>
   );
 }

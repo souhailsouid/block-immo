@@ -1,15 +1,20 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ImgsViewer from 'react-images-viewer';
 import { Box, Grid } from '@mui/material';
+import { useParams } from 'react-router-dom';
+
+// Photos service
+import { propertyPhotosService } from 'services/api/modules/properties/propertyPhotosService';
+
+// Images de fallback en cas d'absence de photos
 import image1 from 'assets/images/products/product-details-1.jpg';
 import image2 from 'assets/images/products/product-details-2.jpg';
 import image3 from 'assets/images/products/product-details-3.jpg';
 import image4 from 'assets/images/products/product-details-4.jpg';
 import image5 from 'assets/images/products/product-details-5.jpg';
 
-
-const images = [
+const fallbackImages = [
   { src: image1, label: 'Avant' },
   { src: image2, label: 'Après' },
   { src: image3 },
@@ -123,11 +128,75 @@ const Row1 = ({ images, reverse, onSetCurrentImage, groupStartIndex }) => {
     </Grid>
   );
 }
-export default function ZigZagGrid() {
-  const grouped = groupByThree(images);
+export default function ZigZagGrid({ propertyId: propPropertyId }) {
+  const { propertyId: urlPropertyId } = useParams();
+  const propertyId = propPropertyId || urlPropertyId;
+  const [images, setImages] = useState(fallbackImages);
   const [currentImage, setCurrentImage] = useState(image1);
   const [imgsViewer, setImgsViewer] = useState(false);
   const [imgsViewerCurrent, setImgsViewerCurrent] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 🔄 Charger les photos au montage du composant
+  useEffect(() => {
+    const loadPropertyPhotos = async () => {
+      if (!propertyId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await propertyPhotosService.getPropertyPhotos(propertyId);
+        
+        if (response.success && response.photos && response.photos.length > 0) {
+          // 🔄 Transformer les photos S3 en format attendu
+          const photoObjects = response.photos.map((photo, index) => ({
+            src: typeof photo === 'string' ? photo : photo.url || photo,
+            label: photo.fileName || `Photo ${index + 1}`,
+            key: photo.key || photo
+          }));
+          
+          console.log('🖼️ Loaded property photos:', photoObjects.length);
+          setImages(photoObjects);
+          setCurrentImage(photoObjects[0]); // Définir la première photo comme courante
+        } else {
+          console.log(`ℹ️ No photos found for property ${propertyId}, using fallback images`);
+          setImages(fallbackImages);
+          setCurrentImage(image1);
+        }
+      } catch (err) {
+        console.error('❌ Error loading property photos:', err);
+        setError(err.message);
+        setImages(fallbackImages);
+        setCurrentImage(image1);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPropertyPhotos();
+
+    // 🎧 ÉCOUTER L'ÉVÉNEMENT DE MISE À JOUR DES PHOTOS
+    const handlePhotosUpdate = (event) => {
+      if (event.detail.propertyId === propertyId) {
+        console.log('🔄 Received photos update event for property:', propertyId);
+        loadPropertyPhotos(); // Recharger les photos
+      }
+    };
+
+    window.addEventListener('propertyPhotosUpdated', handlePhotosUpdate);
+
+    // 🧹 Nettoyer l'event listener
+    return () => {
+      window.removeEventListener('propertyPhotosUpdated', handlePhotosUpdate);
+    };
+  }, [propertyId]);
+
+  const grouped = groupByThree(images);
 
   const handleSetCurrentImage = (index) => {
     setCurrentImage(images[index]);
@@ -141,6 +210,46 @@ export default function ZigZagGrid() {
   const closeImgsViewer = () => setImgsViewer(false);
   const imgsViewerNext = () => setImgsViewerCurrent((i) => (i + 1) % images.length);
   const imgsViewerPrev = () => setImgsViewerCurrent((i) => (i - 1 + images.length) % images.length);
+
+  // 🔄 Affichage pendant le chargement
+  if (loading) {
+    return (
+      <Box sx={{ flexGrow: 1, px: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
+        <Box textAlign="center">
+          <Box
+            component="div"
+            sx={{
+              width: 50,
+              height: 50,
+              border: '3px solid #f3f3f3',
+              borderTop: '3px solid #4472c4',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              '@keyframes spin': {
+                '0%': { transform: 'rotate(0deg)' },
+                '100%': { transform: 'rotate(360deg)' }
+              }
+            }}
+          />
+          <Box mt={2} color="text.secondary">
+            Chargement des photos...
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
+
+  // 🚨 Affichage en cas d'erreur
+  if (error) {
+    return (
+      <Box sx={{ flexGrow: 1, px: 2, textAlign: 'center', py: 4 }}>
+        <Box color="error.main">
+          Erreur lors du chargement des photos: {error}
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ flexGrow: 1, px: 2, cursor: 'pointer' }} onClick={handleGalleryClick}>
       <ImgsViewer

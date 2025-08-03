@@ -21,7 +21,6 @@ const validations = [
   Yup.object().shape({
     [kycFile.name]: Yup.string().required(kycFile.errorMsg),
   }),
-  
 
 ];
 

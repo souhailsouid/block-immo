@@ -1,6 +1,5 @@
 /* eslint-disable prefer-destructuring */
 
-
 function item(theme, ownerState) {
   const { palette, borders, functions, transitions } = theme;
   const { active, color, transparentSidenav, whiteSidenav, darkMode } =

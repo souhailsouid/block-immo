@@ -6,7 +6,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 
-function DeleteAccount() {
+const DeleteAccount = () => {
   return (
     <Card id="delete-account">
       <MDBox
@@ -25,11 +25,11 @@ function DeleteAccount() {
           </MDTypography>
         </MDBox>
         <MDBox display="flex" flexDirection={{ xs: "column", sm: "row" }}>
-          <MDButton variant="outlined" color="secondary">
+          <MDButton variant="outlined" color="secondary" disabled>
             deactivate
           </MDButton>
           <MDBox ml={{ xs: 0, sm: 1 }} mt={{ xs: 1, sm: 0 }}>
-            <MDButton variant="gradient" color="error" sx={{ height: "100%" }}>
+            <MDButton variant="gradient" color="error" sx={{ height: "100%" }} disabled>
               delete account
             </MDButton>
           </MDBox>

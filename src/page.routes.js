@@ -27,7 +27,16 @@ const pageRoutes = [
       {
         name: "dashboards",
         icon: <Icon>dashboard</Icon>,
-        route: "/dashboards/market-place",
+        collapse: [
+          {
+            name: "market place",
+            route: "/dashboards/market-place",
+          },
+          {
+            name: "my portfolio",
+            route: "/investor",
+          },
+        ],
       },
       {
         name: "account",
@@ -60,8 +69,8 @@ const pageRoutes = [
         icon: <Icon>login</Icon>,
         collapse: [
           {
-            name: "illustration",
-            route: "/authentication/sign-in/illustration",
+            name: "sign in",
+            route: "/authentication/sign-in",
           },
         ],
       },
@@ -84,6 +93,10 @@ const pageRoutes = [
           {
             name: "cover",
             route: "/authentication/reset-password/cover",
+          },
+          {
+            name: "confirm",
+            route: "/authentication/reset-password/confirm",
           },
         ],
       },

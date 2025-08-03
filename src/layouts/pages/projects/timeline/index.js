@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 // Material Dashboard 3 PRO React components
 import MDBox from 'components/MDBox';
@@ -7,23 +7,9 @@ import MDBox from 'components/MDBox';
 import TimelineList from 'examples/Timeline/TimelineList';
 import TimelineItem from 'examples/Timeline/TimelineItem';
 
-// Data
-import timelineData, { getTimelineData } from 'layouts/pages/projects/timeline/data/timelineData';
-
-const Timeline = () => {
-  const [currentTimelineData, setCurrentTimelineData] = useState(timelineData);
-
-  // Update timeline data when it changes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const updatedData = getTimelineData();
-      if (JSON.stringify(updatedData) !== JSON.stringify(currentTimelineData)) {
-        setCurrentTimelineData(updatedData);
-      }
-    }, 1000); // Check every second for updates
-
-    return () => clearInterval(interval);
-  }, [currentTimelineData]);
+const Timeline = ({ timelineData }) => {
+  
+const currentTimelineData = timelineData || [];
 
   const renderTimelineItems = currentTimelineData.map(
     ({ color, icon, title, dateTime, description, badges, lastItem }) => (
@@ -49,5 +35,9 @@ const Timeline = () => {
     </MDBox>
   );
 }
+
+Timeline.propTypes = {
+  timelineData: PropTypes.array.isRequired,
+};
 
 export default Timeline;

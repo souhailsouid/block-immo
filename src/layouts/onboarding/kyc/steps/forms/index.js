@@ -18,7 +18,6 @@ const UserKYCInfo = ({ formData }) => {
   const { firstName, lastName,  phone, birthDate } = formField;
   const { firstName: firstNameV, lastName: lastNameV, phone: phoneV, birthDate: birthDateV } = values;
 
-  console.log('formData', formData);
   // Validation de la date de naissance avec useEffect pour éviter les boucles infinies
   useEffect(() => {
     if (birthDateV && birthDateV.length > 0 && touched.birthDate) {

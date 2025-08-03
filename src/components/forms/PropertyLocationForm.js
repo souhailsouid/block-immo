@@ -1,107 +1,82 @@
 import PropTypes from 'prop-types';
 import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
 import MDBox from 'components/MDBox';
 import MDButton from 'components/MDButton';
 import { Grid, Card, Typography } from '@mui/material';
 import FormField from 'layouts/pages/users/new-user/components/FormField';
 import LocationCascadeSelect from 'components/MDSelect/LocationCascadeSelect';
+import { locationValidationSchema } from 'validations';
+import { getCoordinatesFromAddress } from 'services/api/modules/location/locationService';
+import { mergeInitialValues } from 'utils/formUtils';
+import { DEFAULT_VALUES_PROPERTY_LOCATION } from 'constants/locationConstants';
+import { onSubmitForm } from 'utils/validateForms';
+import { useNotification } from 'context/NotificationContext';
 
-const validationSchema = Yup.object().shape({
-  // Address fields
-  address: Yup.string().required('Address is required'),
-  city: Yup.string().required('City is required'),
-  country: Yup.string().required('Country is required'),
+const PropertyLocationForm = ({ initialData = {}, onSave, onCancel }) => {
+  const { showNotification } = useNotification();
 
-  // Optional fields
-  additionalInfo: Yup.string(),
+  const initialValues = mergeInitialValues(initialData, DEFAULT_VALUES_PROPERTY_LOCATION);
 
-  // Coordinates (auto-generated)
-  latitude: Yup.number().nullable(),
-  longitude: Yup.number().nullable(),
-
-  // Location description
-  locationDescription: Yup.string().required('Location description is required'),
-});
-
-// Function to get coordinates from address using geocoding
-const getCoordinatesFromAddress = async (address, city, country) => {
-  try {
-    const fullAddress = `${address}, ${city}, ${country}`;
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`
-    );
-    const data = await response.json();
-    
-    if (data && data.length > 0) {
-      return {
-        latitude: parseFloat(data[0].lat),
-        longitude: parseFloat(data[0].lon)
-      };
+  // 🎯 Configuration spécifique pour ce formulaire
+  const formConfig = {
+    cleanFields: ['updatedAt', 'createdAt', 'propertyId'],
+    validate: (values) => {
+      // Validation spécifique pour la localisation
+      if (!values.country || !values.city) {
+        showNotification(
+          'Business Validation Error',
+          'Country and city are required',
+          'error',
+          { duration: 3000, autoHide: true }
+        );
+        return 'Country and city are required';
+      }
+      
+      // Validation des coordonnées si fournies
+      if (values.latitude !== undefined && values.latitude !== null) {
+        const latitude = parseFloat(values.latitude);
+        if (isNaN(latitude) || latitude < -90 || latitude > 90) {
+          showNotification(
+            'Business Validation Error',
+            'Latitude must be between -90 and 90',
+            'error',
+            { duration: 3000, autoHide: true }
+          );
+          return 'Latitude must be between -90 and 90';
+        }
+      }
+      
+      if (values.longitude !== undefined && values.longitude !== null) {
+        const longitude = parseFloat(values.longitude);
+        if (isNaN(longitude) || longitude < -180 || longitude > 180) {
+          showNotification(
+            'Business Validation Error',
+            'Longitude must be between -180 and 180',
+            'error',
+            { duration: 3000, autoHide: true }
+          );
+          return 'Longitude must be between -180 and 180';
+        }
+      }
+      
+      return null;
     }
-    return null;
-  } catch (error) {
-    console.error('Error getting coordinates:', error);
-    return null;
-  }
-};
-
-const PropertyLocationForm = ({ initialData = {}, onSave, hideButtons = false, onValidationChange }) => {
-  const initialValues = {
-    // Address fields
-    address: initialData.address || '',
-    city: initialData.city || '',
-    country: initialData.country || '',
-
-    // Coordinates
-    latitude: initialData.lat || initialData.latitude || null,
-    longitude: initialData.lng || initialData.longitude || null,
-
-    // Location description
-    locationDescription: initialData.description || initialData.locationDescription || '',
   };
 
-  // Custom validation function
-  const validateForm = (values) => {
-    const errors = [];
-
-    // Address validation
-    if (!values.address || values.address.trim() === '') {
-      errors.push('Address is required');
-    }
-
-    if (!values.city || values.city.trim() === '') {
-      errors.push('City is required');
-    }
-
-    if (!values.country || values.country.trim() === '') {
-      errors.push('Country is required');
-    }
-
-    if (!values.locationDescription || values.locationDescription.trim() === '') {
-      errors.push('Location description is required');
-    }
-
-    const isValid = errors.length === 0;
-    
-    if (onValidationChange) {
-      onValidationChange(isValid, errors);
-    }
-
-    return isValid;
+  const handleSubmit = (values, { setSubmitting, setErrors }) => {
+    onSubmitForm(values, onSave, {
+      setSubmitting,
+      setErrors,
+      cleanFields: formConfig.cleanFields,
+      validate: formConfig.validate
+    });
   };
 
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={validationSchema}
-      onSubmit={(values, { setSubmitting }) => {
-        if (validateForm(values)) {
-          onSave(values);
-        }
-        setSubmitting(false);
-      }}
-      validate={validateForm}
+      validationSchema={locationValidationSchema}
+      onSubmit={handleSubmit}
       validateOnChange={true}
       validateOnBlur={true}
     >
@@ -266,17 +241,15 @@ const PropertyLocationForm = ({ initialData = {}, onSave, hideButtons = false, o
               </Card>
             </Grid>
 
-            {/* Submit Buttons - Only show if not hidden */}
-            {!hideButtons && (
-              <MDBox mt={4} display="flex" justifyContent="flex-end" gap={2}>
-                <MDButton variant="outlined" color="secondary" onClick={() => onSave(null)}>
-                  Cancel
-                </MDButton>
-                <MDButton variant="contained" color="customBlue" type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : 'Save Location Details'}
-                </MDButton>
-              </MDBox>
-            )}
+            {/* Submit Buttons */}
+            <MDBox mt={4} display="flex" justifyContent="flex-end" gap={2}>
+              <MDButton variant="outlined" color="secondary" onClick={() => onCancel(null)}>
+                Cancel
+              </MDButton>
+              <MDButton variant="contained" color="customBlue" onClick={handleSubmit} disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : 'Save Location Details'}
+              </MDButton>
+            </MDBox>
           </Form>
         );
       }}
@@ -285,10 +258,9 @@ const PropertyLocationForm = ({ initialData = {}, onSave, hideButtons = false, o
 };
 
 PropertyLocationForm.propTypes = {
-  initialData: PropTypes.object,
-  onSave: PropTypes.func,
-  hideButtons: PropTypes.bool,
-  onValidationChange: PropTypes.func,
+  initialData: PropTypes.object.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default PropertyLocationForm;

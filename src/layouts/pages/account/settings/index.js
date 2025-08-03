@@ -10,10 +10,16 @@ import Sidenav from 'layouts/pages/account/settings/components/Sidenav';
 import Header from 'layouts/pages/account/settings/components/Header';
 import BasicInfo from 'layouts/pages/account/settings/components/BasicInfo';
 import ChangePassword from 'layouts/pages/account/settings/components/ChangePassword';
-import Authentication from 'layouts/pages/account/settings/components/Authentication';
 import DeleteAccount from 'layouts/pages/account/settings/components/DeleteAccount';
+import ProfessionalInfo from 'layouts/pages/account/settings/components/ProfessionalInfo';
+import Billing from 'layouts/pages/account/billing';
+import { useUserProfile } from 'hooks/useUserProfile';
 
 const Settings = () => {
+  const { userProfile } = useUserProfile();
+  console.log('userProfile', userProfile);
+  console.log('userProfile?.role', userProfile?.role);
+  console.log('userProfile?.role === PROFESSIONAL', userProfile?.role === 'PROFESSIONAL');
   return (
     <BaseLayout>
       <MDBox mt={4}>
@@ -30,13 +36,17 @@ const Settings = () => {
                 <Grid item xs={12}>
                   <BasicInfo />
                 </Grid>
+                {userProfile?.primaryRole === 'PROFESSIONAL' && (
+                  <Grid item xs={12}>
+                    <ProfessionalInfo />
+                  </Grid>
+                )}
                 <Grid item xs={12}>
                   <ChangePassword />
                 </Grid>
                 <Grid item xs={12}>
-                  <Authentication />
+                  <Billing userProfile={userProfile} />
                 </Grid>
-
                 <Grid item xs={12}>
                   <DeleteAccount />
                 </Grid>

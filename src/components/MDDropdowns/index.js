@@ -7,6 +7,12 @@ import MDBox from 'components/MDBox';
 import MDInput from 'components/MDInput';
 
 const MDDropdowns = ({ options, placeholder, value, onChange, onBlur, name, multiple = false }) => {
+  // Utiliser les clés fournies par les données ou en créer de nouvelles si nécessaire
+  const optionsWithKeys = options.map((option, index) => ({
+    ...option,
+    key: option.key || `${option.value}-${index}`
+  }));
+
   const handleChange = (_event, newValue) => {
     if (onChange) {
       if (multiple) {
@@ -47,13 +53,13 @@ const MDDropdowns = ({ options, placeholder, value, onChange, onBlur, name, mult
     if (multiple) {
       // Pour la sélection multiple, on retourne un tableau d'objets
       if (Array.isArray(value)) {
-        return value.map(v => options.find(opt => opt.value === v)).filter(Boolean);
+        return value.map(v => optionsWithKeys.find(opt => opt.value === v)).filter(Boolean);
       }
       return [];
     } else {
       // Pour la sélection simple, on retourne l'objet correspondant
       if (value) {
-        return options.find(opt => opt.value === value) || null;
+        return optionsWithKeys.find(opt => opt.value === value) || null;
       }
       return null;
     }
@@ -64,10 +70,13 @@ const MDDropdowns = ({ options, placeholder, value, onChange, onBlur, name, mult
       <Grid item xs={12} md={12}>
         <Autocomplete
           value={getDisplayValue()}
-          options={options}
+          options={optionsWithKeys}
           onChange={handleChange}
           onBlur={handleBlur}
           multiple={multiple}
+          freeSolo={false}
+          autoComplete={true}
+          autoHighlight={true}
           getOptionLabel={(option) => option.label || ''}
           isOptionEqualToValue={(option, value) => option.value === value.value}
           renderInput={(params) => (

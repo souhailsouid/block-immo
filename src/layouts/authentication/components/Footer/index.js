@@ -13,7 +13,7 @@ import MDTypography from "components/MDTypography";
 // Material Dashboard 3 PRO React base styles
 import typography from "assets/theme/base/typography";
 
-function Footer({ light = false }) {
+const Footer = ({ light = false }) => {
   const { size } = typography;
 
   return (
@@ -42,9 +42,9 @@ function Footer({ light = false }) {
               </Icon>
             </MDBox>
             by
-            <Link href="https://www.creative-tim.com/" target="_blank">
+            <Link href="https://souhailsouid.vercel.app/" target="_blank">
               <MDTypography variant="button" fontWeight="medium" color={light ? "white" : "dark"}>
-                &nbsp;Creative Tim&nbsp;
+                &nbsp;Souhail Souid&nbsp;
               </MDTypography>
             </Link>
             for a better web.
@@ -67,49 +67,17 @@ function Footer({ light = false }) {
             })}
           >
             <MDBox component="li" pr={2} lineHeight={1}>
-              <Link href="https://www.creative-tim.com/" target="_blank">
+              <Link href="https://souhailsouid.vercel.app/" target="_blank">
                 <MDTypography
                   variant="button"
                   fontWeight="regular"
                   color={light ? "white" : "dark"}
                 >
-                  Creative Tim
+                  Souhail Souid
                 </MDTypography>
               </Link>
             </MDBox>
-            <MDBox component="li" px={2} lineHeight={1}>
-              <Link href="https://www.creative-tim.com/presentation" target="_blank">
-                <MDTypography
-                  variant="button"
-                  fontWeight="regular"
-                  color={light ? "white" : "dark"}
-                >
-                  About Us
-                </MDTypography>
-              </Link>
-            </MDBox>
-            <MDBox component="li" px={2} lineHeight={1}>
-              <Link href="https://www.creative-tim.com/blog" target="_blank">
-                <MDTypography
-                  variant="button"
-                  fontWeight="regular"
-                  color={light ? "white" : "dark"}
-                >
-                  Blog
-                </MDTypography>
-              </Link>
-            </MDBox>
-            <MDBox component="li" pl={2} lineHeight={1}>
-              <Link href="https://www.creative-tim.com/license" target="_blank">
-                <MDTypography
-                  variant="button"
-                  fontWeight="regular"
-                  color={light ? "white" : "dark"}
-                >
-                  License
-                </MDTypography>
-              </Link>
-            </MDBox>
+
           </MDBox>
         </MDBox>
       </Container>

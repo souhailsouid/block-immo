@@ -57,7 +57,7 @@ const MDDatePicker = ({
       const syntheticEvent = {
         target: {
           name: name,
-          value: dateStr,
+          value: selectedDates[0] || dateStr, // Retourner l'objet Date si disponible
         },
       };
       onChange(syntheticEvent);
@@ -92,6 +92,23 @@ const MDDatePicker = ({
     return undefined;
   };
 
+  // Formater la valeur pour l'affichage dans l'input
+  const getDisplayValue = () => {
+    if (!value) return '';
+    
+    try {
+      if (value instanceof Date) {
+        return value.toISOString().split('T')[0];
+      }
+      if (typeof value === 'string') {
+        return new Date(value).toISOString().split('T')[0];
+      }
+      return '';
+    } catch (error) {
+      return '';
+    }
+  };
+
   return (
     <>
       <style>{flatpickrStyles}</style>
@@ -107,13 +124,13 @@ const MDDatePicker = ({
           disableMobile: false,
           ...rest.options,
         }}
-        render={({ defaultValue }, ref) => {
+        render={({ value }, ref) => {
           return (
             <MDInput
               sx={{ width: '100%' }}
               {...input}
               shrink={true}
-              defaultValue={value || defaultValue}
+              value={getDisplayValue()}
               inputRef={ref}
               label={label}
               name={name}

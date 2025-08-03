@@ -3,7 +3,10 @@ import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { GOOGLE_MAPS_API_KEY } from 'config/googleMaps';
 import { Box, Typography } from '@mui/material';
 
-const PropertyLocationMap = ({ lat = 48.838624, lng = 2.559066 }) => {
+const PropertyLocationMap = ({ lat, lng }) => {
+  // Validation et valeurs par défaut pour les coordonnées
+  const validLat = lat && !isNaN(lat) && isFinite(lat) ? lat : 48.838624;
+  const validLng = lng && !isNaN(lng) && isFinite(lng) ? lng : 2.559066;
   const [mapError, setMapError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,7 +43,7 @@ const PropertyLocationMap = ({ lat = 48.838624, lng = 2.559066 }) => {
         Map could not be loaded
       </Typography>
       <Typography variant="caption" color="grey.500" textAlign="center">
-        Coordinates: {lat.toFixed(6)}, {lng.toFixed(6)}
+        Coordinates: {validLat.toFixed(6)}, {validLng.toFixed(6)}
       </Typography>
     </Box>
   );
@@ -84,12 +87,12 @@ const PropertyLocationMap = ({ lat = 48.838624, lng = 2.559066 }) => {
           borderRadius: 12,
           display: isLoading ? 'none' : 'block'
         }}
-        center={{ lat, lng }}
+        center={{ lat: validLat, lng: validLng }}
         zoom={14}
         onLoad={handleMapLoad}
         onError={handleMapError}
       >
-        <Marker position={{ lat, lng }} />
+        <Marker position={{ lat: validLat, lng: validLng }} />
       </GoogleMap>
     </LoadScript>
   );

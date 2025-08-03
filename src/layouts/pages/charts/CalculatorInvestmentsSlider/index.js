@@ -8,7 +8,6 @@ import MDTypography from 'components/MDTypography';
 import MDBox from 'components/MDBox';
 import { formatCurrency } from 'utils';
 
-
 const iOSBoxShadow =
   '0 3px 1px rgba(0,0,0,0.1),0 4px 8px rgba(0,0,0,0.13),0 0 0 1px rgba(0,0,0,0.02)';
 

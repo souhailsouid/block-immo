@@ -12,13 +12,17 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-const Breadcrumbs = ({ 
+const Breadcrumbs = ({
   icon = "home",
   title = "",
   route = ["", ""],
-  light = false 
+  light = false
 }) => {
-  const routes = route.slice(0, -1);
+  // 🔄 Construire les liens correctement
+  const buildPath = (index) => {
+    return "/" + route.slice(0, index + 1).join("/");
+  };
+
   return (
     <MDBox ml={{ xs: 0, xl: 1 }}>
       <MuiBreadcrumbs
@@ -29,21 +33,44 @@ const Breadcrumbs = ({
           },
         }}
       >
-        {routes.map((el) => (
-          <Link to={`/${el}`} key={el}>
-            <MDTypography
-              component="span"
-              variant="button"
-              fontWeight="regular"
-              textTransform="capitalize"
-              color={light ? "white" : "dark"}
-              opacity={light ? 0.8 : 0.5}
-              sx={{ lineHeight: 0 }}
-            >
-              {el}
-            </MDTypography>
-          </Link>
-        ))}
+        {/* 🏠 Lien Home */}
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <MDTypography
+            component="span"
+            variant="button"
+            fontWeight="regular"
+            textTransform="capitalize"
+            color={light ? "white" : "dark"}
+            opacity={light ? 0.8 : 0.5}
+            sx={{ lineHeight: 0, display: 'flex', alignItems: 'center', gap: 0.5 }}
+          >
+            <Icon fontSize="small">{icon}</Icon>
+            Home
+          </MDTypography>
+        </Link>
+
+        {/* 📍 Liens intermédiaires */}
+        {route.map((el, index) => {
+          if (index === route.length - 1) return null; // Dernier élément = titre actuel
+          
+          return (
+            <Link to={buildPath(index)} key={el} style={{ textDecoration: 'none' }}>
+              <MDTypography
+                component="span"
+                variant="button"
+                fontWeight="regular"
+                textTransform="capitalize"
+                color={light ? "white" : "dark"}
+                opacity={light ? 0.8 : 0.5}
+                sx={{ lineHeight: 0 }}
+              >
+                {el.replace("-", " ")}
+              </MDTypography>
+            </Link>
+          );
+        })}
+
+        {/* 🎯 Titre actuel (non cliquable) */}
         <MDTypography
           variant="button"
           fontWeight="bold"
