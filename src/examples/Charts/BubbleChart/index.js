@@ -29,13 +29,13 @@ import colors from "assets/theme/base/colors";
 
 ChartJS.register(LinearScale, PointElement, Tooltip, Legend);
 
-function BubbleChart({ 
+const BubbleChart = ({ 
   icon = { color: "info", component: "" }, 
   title = "", 
   description = "", 
   height = "100%", 
   chart 
-}) {
+}) => {
   const chartDatasets = chart.datasets
     ? chart.datasets.map((dataset) => ({
         ...dataset,

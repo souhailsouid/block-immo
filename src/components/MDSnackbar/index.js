@@ -18,7 +18,7 @@ import MDSnackbarIconRoot from "components/MDSnackbar/MDSnackbarIconRoot";
 // Material Dashboard 3 PRO React context
 import { useMaterialUIController } from "context";
 
-function MDSnackbar({ color = "info", icon, title, dateTime, content, close, bgWhite = false, ...rest }) {
+const MDSnackbar = ({ color = "info", icon, title, dateTime, content, close, bgWhite = false, ...rest }) => {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 

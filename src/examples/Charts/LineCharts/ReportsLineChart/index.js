@@ -40,7 +40,7 @@ ChartJS.register(
   Filler
 );
 
-function ReportsLineChart({ color = "info", title, description = "", date, chart }) {
+const ReportsLineChart = ({ color = "info", title, description = "", date, chart }) => {
   const { data, options } = configs(chart.labels || [], chart.datasets || {});
 
   return (

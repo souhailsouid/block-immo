@@ -14,7 +14,7 @@ import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import { useNavigate } from "react-router-dom";
 const images = [image1, image2, image3, image4, image5];
 
-function PropertiesPreviews({ propertyId }) {
+const PropertiesPreviews = ({ propertyId }) => {
   const navigate = useNavigate();
   const [currentImage, setCurrentImage] = useState(image1);
   const [imgsViewer, setImgsViewer] = useState(false);

@@ -9,7 +9,7 @@ import MDTypography from "components/MDTypography";
 // EditProduct page components
 import FormField from "layouts/ecommerce/products/edit-product/components/FormField";
 
-function Socials() {
+const Socials = () => {
   return (
     <Card>
       <MDBox p={3}>

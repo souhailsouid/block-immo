@@ -20,13 +20,13 @@ import configs from "examples/Charts/PieChart/configs";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-function PieChart({ 
+const PieChart = ({ 
   icon = { color: "info", component: "" }, 
   title = "", 
   description = "", 
   height = "19.125rem", 
   chart 
-}) {
+}) => {
   const { data, options } = configs(chart.labels || [], chart.datasets || {});
 
   const renderChart = (

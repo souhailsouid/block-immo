@@ -18,7 +18,7 @@ import MDTypography from "components/MDTypography";
 // Material Dashboard 3 PRO React TS exampless
 import DefaultNavbarDropdown from "examples/Navbars/DefaultNavbar/DefaultNavbarDropdown";
 
-function DefaultNavbarMobile({ routes, open }) {
+const DefaultNavbarMobile = ({ routes, open }) => {
   const [collapse, setCollapse] = useState("");
 
   const handleSetCollapse = (name) => (collapse === name ? setCollapse(false) : setCollapse(name));

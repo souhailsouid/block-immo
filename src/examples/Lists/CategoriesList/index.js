@@ -12,7 +12,7 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-function CategoriesList({ title, categories }) {
+const CategoriesList = ({ title, categories }) => {
   const renderItems = categories.map(({ color, icon, name, description, route }, key) => (
     <MDBox
       key={name}

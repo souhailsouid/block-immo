@@ -7,7 +7,7 @@ import Icon from "@mui/material/Icon";
 // Material Dashboard 3 PRO React components
 import MDTypography from "components/MDTypography";
 
-function ReviewCell({ rating }) {
+const ReviewCell = ({ rating }) => {
   const ratings = {
     0.5: [
       <Icon key={1}>star_outline</Icon>,

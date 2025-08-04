@@ -46,9 +46,15 @@ import NotificationManager from 'components/NotificationManager';
 import brandWhite from 'assets/images/logo-ct.png';
 import brandDark from 'assets/images/logo-ct-dark.png';
 
+// Authentication and Route Protection
 import { AuthProvider } from 'hooks/useAuth';
 import { RoleProvider } from 'context/RoleContext';
 import { InvestmentProvider } from 'context/InvestmentContext';
+import PrivateApp from 'components/PrivateApp';
+import { AuthRoute } from 'components/RouteProtection';
+import AuthDebug from 'components/AuthDebug';
+
+// Pages
 import PropertiesPage from 'layouts/properties';
 import OnBoardingKYC from 'layouts/onboarding/kyc';
 import PropertyPage from 'layouts/ecommerce/properties/property-page';
@@ -182,40 +188,73 @@ export default function App() {
               <InvestmentProvider>
                 <NotificationProvider>
                   <ModalProvider>
-                    {layout === 'dashboard' && !pathname.startsWith('/authentication/') && (
-                      <>
-                        <Sidenav
-                          color={sidenavColor}
-                          brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-                          brandName="Souhail"
-                          routes={routes}
-                          onMouseEnter={handleOnMouseEnter}
-                          onMouseLeave={handleOnMouseLeave}
-                        />
-                        <Configurator />
-                        {configsButton}
-                      </>
-                    )}
-                    {layout === 'vr' && <Configurator />}
                     <Routes>
-                      {getRoutes(routes())}
-                      <Route path="/properties/:propertyId/images" element={<PropertiesPage />} />
-                      <Route path="/properties/:propertyId" element={<PropertyPage />} />
-                      <Route path="/properties/add" element={<AddPropertyPage />} />
-                      <Route path="/properties/my-properties" element={<MyProperties />} />
-                      <Route path="/logout" element={<LogoutPage />} />
-                      <Route path="/authentication/sign-in/illustration" element={<SignInIllustration />} />
-                      <Route path="/authentication/sign-up/illustration" element={<SignUpIllustration />} />
-                      <Route path="/authentication/email-verification" element={<EmailVerificationPage />} />
-                      <Route path="/onboarding/kyc/identity-verification" element={<OnBoardingKYC />} />
-                      <Route path="/dashboards/*" element={<Navigate to="/dashboards/market-place" />} />
-                      <Route path="/authentication/reset-password" element={<Cover />} />
-                      <Route path="/authentication/reset-password/confirm" element={<ConfirmResetPassword />} />
-                      <Route path="/" element={<Navigate to="/dashboards/market-place" />} />
+                      {/* Routes d'authentification (publiques) */}
+                      <Route path="/authentication/sign-in/illustration" element={
+                        <AuthRoute>
+                          <SignInIllustration />
+                        </AuthRoute>
+                      } />
+                      <Route path="/authentication/sign-up/illustration" element={
+                        <AuthRoute>
+                          <SignUpIllustration />
+                        </AuthRoute>
+                      } />
+                      <Route path="/authentication/email-verification" element={
+                        <AuthRoute>
+                          <EmailVerificationPage />
+                        </AuthRoute>
+                      } />
+                      <Route path="/authentication/reset-password" element={
+                        <AuthRoute>
+                          <Cover />
+                        </AuthRoute>
+                      } />
+                      <Route path="/authentication/reset-password/confirm" element={
+                        <AuthRoute>
+                          <ConfirmResetPassword />
+                        </AuthRoute>
+                      } />
+                      
+                      {/* Application privée - Routes protégées directement */}
+                      <Route path="/*" element={
+                        <PrivateApp>
+                          {layout === 'dashboard' && (
+                            <>
+                              <Sidenav
+                                color={sidenavColor}
+                                brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+                                brandName="Souhail"
+                                routes={routes}
+                                onMouseEnter={handleOnMouseEnter}
+                                onMouseLeave={handleOnMouseLeave}
+                              />
+                              <Configurator />
+                              {configsButton}
+                            </>
+                          )}
+                          {layout === 'vr' && <Configurator />}
+                          
+                          {/* Routes internes avec wrapper Routes */}
+                          <Routes>
+                            {getRoutes(routes())}
+                            <Route path="/properties/:propertyId/images" element={<PropertiesPage />} />
+                            <Route path="/properties/:propertyId" element={<PropertyPage />} />
+                            <Route path="/properties/add" element={<AddPropertyPage />} />
+                            <Route path="/properties/my-properties" element={<MyProperties />} />
+                            <Route path="/logout" element={<LogoutPage />} />
+                            <Route path="/onboarding/kyc/identity-verification" element={<OnBoardingKYC />} />
+                            <Route path="/dashboards/*" element={<Navigate to="/dashboards/market-place" />} />
+                            <Route path="/" element={<Navigate to="/dashboards/market-place" />} />
+                          </Routes>
+                          
+                          <ModalManager />
+                          <NotificationManager />
+                          <RoleTest />
+                        </PrivateApp>
+                      } />
                     </Routes>
-                    <ModalManager />
-                    <NotificationManager />
-                    <RoleTest />
+                    <AuthDebug />
                   </ModalProvider>
                 </NotificationProvider>
               </InvestmentProvider>
@@ -233,38 +272,72 @@ export default function App() {
             <InvestmentProvider>
               <NotificationProvider>
                 <ModalProvider>
-                  {layout === 'dashboard' && !pathname.startsWith('/authentication/') && (
-                    <>
-                      <Sidenav
-                        color={sidenavColor}
-                        brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-                        brandName="Souhail"
-                        routes={routes}
-                        onMouseEnter={handleOnMouseEnter}
-                        onMouseLeave={handleOnMouseLeave}
-                        username={userName}
-                      />
-                      <Configurator />
-                      {configsButton}
-                    </>
-                  )}
-                  {layout === 'vr' && <Configurator />}
                   <Routes>
-                    {getRoutes(routes(userName))}
-                    <Route path="/properties/:propertyId/images" element={<PropertiesPage />} />
-                    <Route path="/properties/:propertyId" element={<PropertyPage />} />
-                    <Route path="/properties/add" element={<AddPropertyPage />} />
-                    <Route path="/properties/my-properties" element={<MyProperties />} />
-                    <Route path="/logout" element={<LogoutPage />} />
-                    <Route path="/authentication/sign-in/illustration" element={<SignInIllustration />} />
-                    <Route path="/authentication/sign-up/illustration" element={<SignUpIllustration />} />
-                    <Route path="/authentication/email-verification" element={<EmailVerificationPage />} />
-                    <Route path="/onboarding/kyc/identity-verification" element={<OnBoardingKYC />} />
-                    <Route path="/authentication/reset-password" element={<Cover />} />
-                    <Route path="/authentication/reset-password/confirm" element={<ConfirmResetPassword />} />
+                    {/* Routes d'authentification (publiques) */}
+                    <Route path="/authentication/sign-in/illustration" element={
+                      <AuthRoute>
+                        <SignInIllustration />
+                      </AuthRoute>
+                    } />
+                    <Route path="/authentication/sign-up/illustration" element={
+                      <AuthRoute>
+                        <SignUpIllustration />
+                      </AuthRoute>
+                    } />
+                    <Route path="/authentication/email-verification" element={
+                      <AuthRoute>
+                        <EmailVerificationPage />
+                      </AuthRoute>
+                    } />
+                    <Route path="/authentication/reset-password" element={
+                      <AuthRoute>
+                        <Cover />
+                      </AuthRoute>
+                    } />
+                    <Route path="/authentication/reset-password/confirm" element={
+                      <AuthRoute>
+                        <ConfirmResetPassword />
+                      </AuthRoute>
+                    } />
+                    
+                    {/* Application privée - Routes protégées directement */}
+                    <Route path="/*" element={
+                      <PrivateApp>
+                        {layout === 'dashboard' && (
+                          <>
+                            <Sidenav
+                              color={sidenavColor}
+                              brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+                              brandName="Souhail"
+                              routes={routes}
+                              onMouseEnter={handleOnMouseEnter}
+                              onMouseLeave={handleOnMouseLeave}
+                            />
+                            <Configurator />
+                            {configsButton}
+                          </>
+                        )}
+                        {layout === 'vr' && <Configurator />}
+                        
+                        {/* Routes internes avec wrapper Routes */}
+                        <Routes>
+                          {getRoutes(routes())}
+                          <Route path="/properties/:propertyId/images" element={<PropertiesPage />} />
+                          <Route path="/properties/:propertyId" element={<PropertyPage />} />
+                          <Route path="/properties/add" element={<AddPropertyPage />} />
+                          <Route path="/properties/my-properties" element={<MyProperties />} />
+                          <Route path="/logout" element={<LogoutPage />} />
+                          <Route path="/onboarding/kyc/identity-verification" element={<OnBoardingKYC />} />
+                          <Route path="/dashboards/*" element={<Navigate to="/dashboards/market-place" />} />
+                          <Route path="/" element={<Navigate to="/dashboards/market-place" />} />
+                        </Routes>
+                        
+                        <ModalManager />
+                        <NotificationManager />
+                      </PrivateApp>
+                    } />
                   </Routes>
-                  <ModalManager />
-                  <NotificationManager />
+                  <AuthDebug />
                 </ModalProvider>
               </NotificationProvider>
             </InvestmentProvider>

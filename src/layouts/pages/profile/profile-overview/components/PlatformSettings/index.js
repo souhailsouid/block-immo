@@ -8,7 +8,7 @@ import Switch from "@mui/material/Switch";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-function PlatformSettings() {
+const PlatformSettings = () => {
   const [followsMe, setFollowsMe] = useState(true);
   const [answersPost, setAnswersPost] = useState(false);
   const [mentionsMe, setMentionsMe] = useState(true);

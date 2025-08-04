@@ -10,7 +10,7 @@ import MDButton from "components/MDButton";
 import MDBadge from "components/MDBadge";
 import MDInput from "components/MDInput";
 
-function ProductInfo() {
+const ProductInfo = () => {
   return (
     <MDBox>
       <MDBox mb={1}>

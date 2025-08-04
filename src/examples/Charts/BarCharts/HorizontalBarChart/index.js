@@ -38,7 +38,7 @@ ChartJS.register(
   Legend
 );
 
-function HorizontalBarChart({ icon = { color: "info", component: "" }, title = "", description = "", height = "19.125rem", chart }) {
+const HorizontalBarChart = ({ icon = { color: "info", component: "" }, title = "", description = "", height = "19.125rem", chart }) => {
   const chartDatasets = chart.datasets
     ? chart.datasets.map((dataset) => ({
         ...dataset,

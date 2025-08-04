@@ -8,7 +8,7 @@ import MDTypography from "components/MDTypography";
 // NewProduct page components
 import FormField from "layouts/ecommerce/products/new-product/components/FormField";
 
-function Socials() {
+const Socials = () => {
   return (
     <MDBox>
       <MDTypography variant="h5" fontWeight="bold">

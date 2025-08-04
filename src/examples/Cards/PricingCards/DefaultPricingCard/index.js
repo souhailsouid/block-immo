@@ -13,14 +13,14 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 
-function DefaultPricingCard({ 
+const DefaultPricingCard = ({ 
   color = "white", 
   badge, 
   price, 
   specifications, 
   action, 
   shadow = true 
-}) {
+}) => {
   const renderSpecifications = specifications.map(({ label, includes }) => (
     <MDBox key={label} display="flex" alignItems="center" p={1}>
       <MDBox

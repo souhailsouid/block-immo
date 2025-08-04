@@ -6,7 +6,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDAvatar from "components/MDAvatar";
 
-function ProductCell({ image, name }) {
+const ProductCell = ({ image, name }) => {
   return (
     <MDBox display="flex" alignItems="center" pr={2}>
       <MDBox mr={2}>

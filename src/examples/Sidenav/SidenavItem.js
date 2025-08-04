@@ -16,7 +16,7 @@ import { item, itemContent, itemArrow } from "examples/Sidenav/styles/sidenavIte
 // Material Dashboard 3 PRO React contexts
 import { useMaterialUIController } from "context";
 
-function SidenavItem({ color = "info", name, active = false, nested = false, children = false, open = false, ...rest }) {
+const SidenavItem = ({ color = "info", name, active = false, nested = false, children = false, open = false, ...rest }) => {
   const [controller] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode } = controller;
 

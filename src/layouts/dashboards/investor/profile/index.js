@@ -1,6 +1,8 @@
+/* eslint-disable no-undef */
 import React, { useState, useEffect } from 'react';
 import { useModal } from 'context/ModalContext';
 import { useNotification } from 'context/NotificationContext';
+import { useAuth } from 'hooks/useAuth';
 
 // Material Dashboard 3 PRO React components
 import MDBox from 'components/MDBox';
@@ -10,15 +12,19 @@ import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Chip from '@mui/material/Chip';
-import Divider from '@mui/material/Divider';
 
 // Custom components
 import ProfileBasicInfo from './components/ProfileBasicInfo';
 import InvestmentPreferences from './components/InvestmentPreferences';
+import ProfilePageSkeleton from './components/ProfileSkeleton';
+
+// Avatar component
+import DiceBearAvatar from 'components/DiceBearAvatar';
 
 const InvestorProfile = () => {
   const { openModal } = useModal();
   const { showNotification } = useNotification();
+  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -29,19 +35,41 @@ const InvestorProfile = () => {
 
   const loadUserProfile = async () => {
     try {
-      // Appel API pour récupérer le profil
-      const response = await fetch('/api/user/profile', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      setLoading(true);
       
-      if (response.ok) {
-        const data = await response.json();
-        setProfile(data.data);
-      }
+      // Simuler un délai de chargement pour voir le skeleton
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Pour l'instant, utiliser les données de l'utilisateur connecté
+      // TODO: Appel API pour récupérer le profil complet
+      const mockProfile = {
+        firstName: user?.given_name || user?.firstName || 'John',
+        lastName: user?.family_name || user?.lastName || 'Doe',
+        email: user?.email || 'john.doe@example.com',
+        phone: user?.phone_number || '+33 6 12 34 56 78',
+        location: 'Paris, France',
+        avatar: user?.picture,
+        createdAt: '2023-01-15',
+        investmentPreferences: {
+          propertyTypes: ['Appartement', 'Maison', 'Local commercial'],
+          riskLevel: 'medium',
+          minInvestment: 1000,
+          maxInvestment: 50000,
+          expectedReturn: 8
+        },
+        // Avatar DiceBear
+        userProfile: {
+          avatar: {
+            seed: user?.username || user?.sub || 'default',
+            style: 'pixelArt'
+          }
+        }
+      };
+      
+      setProfile(mockProfile);
     } catch (error) {
-      showNotification('error', 'Erreur lors du chargement du profil');
+      console.error('Error loading profile:', error);
+      showNotification('Erreur lors du chargement du profil', 'error');
     } finally {
       setLoading(false);
     }
@@ -54,8 +82,50 @@ const InvestorProfile = () => {
     });
   };
 
+  // Déterminer quel avatar afficher
+  const renderAvatar = () => {
+    const avatarProps = {
+      sx: { width: 80, height: 80 }
+    };
+
+    // Si l'utilisateur a un avatar DiceBear
+    if (profile?.userProfile?.avatar?.seed) {
+      return (
+        <DiceBearAvatar
+          seed={profile.userProfile.avatar.seed}
+          style={profile.userProfile.avatar.style || 'pixelArt'}
+          size={80}
+          sx={{
+            border: '2px solid #fff',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          }}
+        />
+      );
+    }
+
+    // Si l'utilisateur a une photo de profil
+    if (profile?.avatar) {
+      return (
+        <Avatar
+          src={profile.avatar}
+          {...avatarProps}
+        >
+          {profile?.firstName?.[0]}{profile?.lastName?.[0]}
+        </Avatar>
+      );
+    }
+
+    // Avatar par défaut avec initiales
+    return (
+      <Avatar {...avatarProps}>
+        {profile?.firstName?.[0]}{profile?.lastName?.[0]}
+      </Avatar>
+    );
+  };
+
+  // Afficher le skeleton pendant le chargement
   if (loading) {
-    return <div>Chargement...</div>;
+    return <ProfilePageSkeleton />;
   }
 
   return (
@@ -67,12 +137,7 @@ const InvestorProfile = () => {
             <MDBox p={3}>
               <Grid container alignItems="center" spacing={3}>
                 <Grid item>
-                  <Avatar
-                    src={profile?.avatar}
-                    sx={{ width: 80, height: 80 }}
-                  >
-                    {profile?.firstName?.[0]}{profile?.lastName?.[0]}
-                  </Avatar>
+                  {renderAvatar()}
                 </Grid>
                 <Grid item xs>
                   <MDTypography variant="h4" fontWeight="bold">

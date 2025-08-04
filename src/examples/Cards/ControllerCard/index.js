@@ -12,7 +12,7 @@ import MDTypography from "components/MDTypography";
 // Material Dashboard 3 PRO React context
 import { useMaterialUIController } from "context";
 
-function ControllerCard({ color = "info", state = false, icon, title, description = "", onChange }) {
+const ControllerCard = ({ color = "info", state = false, icon, title, description = "", onChange }) => {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 

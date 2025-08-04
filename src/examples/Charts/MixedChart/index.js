@@ -49,7 +49,7 @@ ChartJS.register(
   Filler
 );
 
-function MixedChart({ icon = { color: "info", component: "" }, title = "", description = "", height = "19.125rem", chart }) {
+const MixedChart = ({ icon = { color: "info", component: "" }, title = "", description = "", height = "19.125rem", chart }) => {
   const chartRef = useRef(null);
   const [chartData, setChartData] = useState({});
 

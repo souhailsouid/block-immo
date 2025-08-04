@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import axios from 'axios';
 import { getCurrentUser, fetchAuthSession } from '@aws-amplify/auth';
 
@@ -19,18 +20,28 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   async (config) => {
     try {
-      // Temporairement désactivé pour les tests
-      // const user = await getCurrentUser();
-      // if (user) {
-      //   const session = await fetchAuthSession();
-      //   const token = session.tokens?.accessToken?.toString();
-      //   
-      //   if (token) {
-      //     config.headers.Authorization = `Bearer ${token}`;
-      //   }
-      // }
-    } catch (error) {
+      // Vérifier si l'utilisateur est authentifié
+      const user = await getCurrentUser();
+      if (user) {
+        const session = await fetchAuthSession();
+        const token = session.tokens?.accessToken?.toString();
+        
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+           
+          console.log('Token ajouté aux headers:', token.substring(0, 20) + '...');
+        } else {
+           
+          console.warn('Utilisateur connecté mais pas de token disponible');
+        }
+      } else {
+         
+        console.log('Aucun utilisateur connecté');
       }
+    } catch (error) {
+       
+      console.error('Erreur lors de la récupération du token:', error);
+    }
     
     return config;
   },
@@ -52,17 +63,28 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       
       try {
+         
+        console.log('Tentative de refresh du token...');
         // Tentative de refresh du token
         const session = await fetchAuthSession({ forceRefresh: true });
         const newToken = session.tokens?.accessToken?.toString();
         
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
+           
+          console.log('Token rafraîchi, nouvelle tentative...');
           return apiClient(originalRequest);
+        } else {
+           
+          console.error('Impossible de rafraîchir le token');
+          // Rediriger vers la page de connexion
+          window.location.href = '/authentication/sign-in/illustration';
         }
       } catch (refreshError) {
+         
+        console.error('Erreur lors du refresh du token:', refreshError);
         // Rediriger vers la page de connexion
-        window.location.href = '/authentication/sign-in';
+        window.location.href = '/authentication/sign-in/illustration';
       }
     }
 
@@ -79,17 +101,29 @@ apiClient.interceptors.response.use(
     
     switch (status) {
       case 400:
+         
+        console.error('Erreur 400 - Bad Request:', data);
         break;
       case 403:
+         
+        console.error('Erreur 403 - Forbidden:', data);
         break;
       case 404:
+         
+        console.error('Erreur 404 - Not Found:', data);
         break;
       case 422:
+         
+        console.error('Erreur 422 - Validation Error:', data);
         break;
       case 500:
+         
+        console.error('Erreur 500 - Server Error:', data);
         break;
       default:
-        }
+         
+        console.error(`Erreur HTTP ${status}:`, data);
+    }
 
     return Promise.reject({
       status,

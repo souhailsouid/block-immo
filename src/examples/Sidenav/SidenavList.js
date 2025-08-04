@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 // @mui material components
 import List from "@mui/material/List";
 
-function SidenavList({ children }) {
+const SidenavList = ({ children }) => {
   return (
     <List
       sx={{

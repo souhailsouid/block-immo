@@ -23,7 +23,7 @@ import logoAsana from "assets/images/small-logos/logo-asana.svg";
 // Material Dashboard 3 PRO React components
 import { useMaterialUIController } from "context";
 
-function Accounts() {
+const Accounts = () => {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 

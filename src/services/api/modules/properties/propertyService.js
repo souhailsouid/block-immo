@@ -10,8 +10,6 @@ import { apiRequest, formatApiResponse } from 'utils/apiUtils';
  */
 export const createOrUpdateProperty = async ({ step, data, propertyId = null }) => {
   try {
-    console.log('🔄 Création/mise à jour de propriété:', { step, data, propertyId });
-    
     const requestData = {
       step,
       data,
@@ -30,7 +28,7 @@ export const createOrUpdateProperty = async ({ step, data, propertyId = null }) 
     });
     
     const response = formatApiResponse(result);
-    console.log('✅ Propriété créée/mise à jour:', response);
+
     return response;
   } catch (error) {
     console.error('❌ Erreur dans createOrUpdateProperty:', error);
@@ -46,9 +44,6 @@ export const createOrUpdateProperty = async ({ step, data, propertyId = null }) 
  */
 export const getProperties = async (filters = {}, pagination = {}) => {
   try {
-    console.log('🔄 Récupération des propriétés');
-    console.log('📋 Filtres:', filters);
-    console.log('📄 Pagination:', pagination);
     
     // Construire les paramètres de requête
     const params = new URLSearchParams();
@@ -72,7 +67,6 @@ export const getProperties = async (filters = {}, pagination = {}) => {
       method: 'GET'
     });
     const properties = formatApiResponse(result);
-    console.log('✅ Propriétés récupérées:', properties);
     return properties;
   } catch (error) {
     console.error('❌ Erreur dans getProperties:', error);
@@ -87,7 +81,6 @@ export const getProperties = async (filters = {}, pagination = {}) => {
  */
 export const getPropertyDetails = async (propertyId) => {
   try {
-    console.log('🔄 Récupération des détails de la propriété:', propertyId);
 
     const result = await apiRequest({
       endpoint: `/properties/${propertyId}`,
@@ -95,7 +88,6 @@ export const getPropertyDetails = async (propertyId) => {
     });
 
     const propertyDetails = formatApiResponse(result);
-    console.log('✅ Détails de la propriété reçus:', propertyDetails);
 
     return propertyDetails;
 
@@ -112,13 +104,12 @@ export const getPropertyDetails = async (propertyId) => {
  */
 export const getProperty = async (propertyId) => {
   try {
-    console.log('🔄 Récupération de la propriété:', propertyId);
+
     const result = await apiRequest({
       endpoint: `/properties/${propertyId}`,
       method: 'GET'
     });
     const property = formatApiResponse(result);
-    console.log('✅ Propriété récupérée:', property);
     return property;
   } catch (error) {
     console.error('❌ Erreur dans getProperty:', error);
@@ -134,14 +125,12 @@ export const getProperty = async (propertyId) => {
  */
 export const updateProperty = async (propertyId, propertyData) => {
   try {
-    console.log('🔄 Mise à jour de la propriété:', propertyId);
     const result = await apiRequest({
       endpoint: `/properties/${propertyId}`,
       method: 'PUT',
       data: propertyData
     });
     const updatedProperty = formatApiResponse(result);
-    console.log('✅ Propriété mise à jour:', updatedProperty);
     return updatedProperty;
   } catch (error) {
     console.error('❌ Erreur dans updateProperty:', error);
@@ -157,14 +146,12 @@ export const updateProperty = async (propertyId, propertyData) => {
  */
 export const updatePropertyLocation = async (propertyId, locationData) => {
   try {
-    console.log('🔄 Mise à jour de la localisation:', propertyId);
     const result = await apiRequest({
       endpoint: `/properties/${propertyId}/location`,
       method: 'PUT',
       data: locationData
     });
     const updatedProperty = formatApiResponse(result);
-    console.log('✅ Localisation mise à jour:', updatedProperty);
     return updatedProperty;
   } catch (error) {
     console.error('❌ Erreur dans updatePropertyLocation:', error);
@@ -180,14 +167,12 @@ export const updatePropertyLocation = async (propertyId, locationData) => {
  */
 export const updatePropertyTable = async (propertyId, tableData) => {
   try {
-    console.log('🔄 Mise à jour de la table:', propertyId);
     const result = await apiRequest({
       endpoint: `/properties/${propertyId}/table`,
       method: 'PUT',
       data: tableData
     });
     const updatedProperty = formatApiResponse(result);
-    console.log('✅ Table mise à jour:', updatedProperty);
     return updatedProperty;
   } catch (error) {
     console.error('❌ Erreur dans updatePropertyTable:', error);
@@ -203,14 +188,12 @@ export const updatePropertyTable = async (propertyId, tableData) => {
  */
 export const updatePropertyTimeline = async (propertyId, timelineData) => {
   try {
-    console.log('🔄 Mise à jour de la timeline:', propertyId);
     const result = await apiRequest({
       endpoint: `/properties/${propertyId}/timeline`,
       method: 'PUT',
       data: timelineData
     });
     const updatedProperty = formatApiResponse(result);
-    console.log('✅ Timeline mise à jour:', updatedProperty);
     return updatedProperty;
   } catch (error) {
     console.error('❌ Erreur dans updatePropertyTimeline:', error);
@@ -225,13 +208,11 @@ export const updatePropertyTimeline = async (propertyId, timelineData) => {
  */
 export const getPropertyPhotos = async (propertyId) => {
   try {
-    console.log('🔄 Récupération des photos:', propertyId);
     const result = await apiRequest({
       endpoint: `/properties/${propertyId}/photos`,
       method: 'GET'
     });
     const photos = formatApiResponse(result);
-    console.log('✅ Photos récupérées:', photos);
     return photos;
   } catch (error) {
     console.error('❌ Erreur dans getPropertyPhotos:', error);
@@ -247,14 +228,12 @@ export const getPropertyPhotos = async (propertyId) => {
  */
 export const managePropertyPhotos = async (propertyId, photoData) => {
   try {
-    console.log('🔄 Gestion des photos:', propertyId);
     const result = await apiRequest({
       endpoint: `/properties/${propertyId}/photos/manage`,
       method: 'PUT',
       data: photoData
     });
     const response = formatApiResponse(result);
-    console.log('✅ Photos gérées:', response);
     return response;
   } catch (error) {
     console.error('❌ Erreur dans managePropertyPhotos:', error);
@@ -264,7 +243,6 @@ export const managePropertyPhotos = async (propertyId, photoData) => {
 
 export const updatePropertyStatus = async (propertyId, newStatus) => {
   try {
-    console.log('🔄 Mise à jour du statut de la propriété:', propertyId, '→', newStatus);
 
     const result = await apiRequest({
       endpoint: `/properties/${propertyId}/status`,
@@ -273,7 +251,6 @@ export const updatePropertyStatus = async (propertyId, newStatus) => {
     });
 
     const response = formatApiResponse(result);
-    console.log('✅ Statut mis à jour:', response);
     return response;
   } catch (error) {
     console.error('❌ Erreur dans updatePropertyStatus:', error);
@@ -283,7 +260,6 @@ export const updatePropertyStatus = async (propertyId, newStatus) => {
 
 export const deleteProperty = async (propertyId) => {
   try {
-    console.log('🗑️ Suppression de la propriété:', propertyId);
     
     const result = await apiRequest({
       endpoint: `/properties/${propertyId}`,
@@ -291,7 +267,6 @@ export const deleteProperty = async (propertyId) => {
     });
     
     const response = formatApiResponse(result);
-    console.log('✅ Propriété supprimée:', response);
     return response;
   } catch (error) {
     console.error('❌ Erreur dans deleteProperty:', error);

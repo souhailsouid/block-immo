@@ -9,7 +9,7 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-function MiniInfoCard({ color = "info", icon, title, description }) {
+const MiniInfoCard = ({ color = "info", icon, title, description }) => {
   return (
     <Card>
       <MDBox p={3}>

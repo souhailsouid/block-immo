@@ -10,7 +10,7 @@ import MDBox from "components/MDBox";
 // Material Dashboard 3 PRO React contexts
 import { useMaterialUIController } from "context";
 
-function DataTableHeadCell({ width = "auto", children, sorted = "none", align = "left", ...rest }) {
+const DataTableHeadCell = ({ width = "auto", children, sorted = "none", align = "left", ...rest }) => {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 

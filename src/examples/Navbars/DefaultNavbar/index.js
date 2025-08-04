@@ -30,7 +30,7 @@ import breakpoints from "assets/theme/base/breakpoints";
 // Material Dashboard 3 PRO React context
 import { useMaterialUIController } from "context";
 
-function DefaultNavbar({ routes, brand = "", transparent = false, light = false, action = false }) {
+const DefaultNavbar = ({ routes, brand = "", transparent = false, light = false, action = false }) => {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 

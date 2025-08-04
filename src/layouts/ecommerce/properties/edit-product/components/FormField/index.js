@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import MDInput from "components/MDInput";
 import MDBox from "components/MDBox";
 
-function FormField({ label, ...rest }) {
+const FormField = ({ label, ...rest }) => {
   return (
     <MDBox mb={2}>
       <MDInput {...rest} variant="standard" label={label} fullWidth />

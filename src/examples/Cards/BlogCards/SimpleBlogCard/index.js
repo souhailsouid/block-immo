@@ -13,7 +13,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 
-function SimpleBlogCard({ image, title, description, action }) {
+const SimpleBlogCard = ({ image, title, description, action }) => {
   return (
     <Card>
       <MDBox position="relative" borderRadius="lg" mt={2} mx={2}>

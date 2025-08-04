@@ -12,7 +12,7 @@ import MDBox from "components/MDBox";
 // Material Dashboard 3 PRO React context
 import { useMaterialUIController, setLayout } from "context";
 
-function PageLayout({ background = "default", children }) {
+const PageLayout = ({ background = "default", children }) => {
   const [, dispatch] = useMaterialUIController();
   const { pathname } = useLocation();
 

@@ -17,7 +17,7 @@ import pageRoutes from "page.routes";
 // Authentication pages components
 import Footer from "layouts/authentication/components/Footer";
 
-function BasicLayout({ image, children }) {
+const BasicLayout = ({ image, children }) => {
   return (
     <PageLayout>
       <DefaultNavbar

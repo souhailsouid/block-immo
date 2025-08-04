@@ -20,13 +20,13 @@ import CalendarRoot from "examples/Calendar/CalendarRoot";
 // Material Dashboard 3 PRO React context
 import { useMaterialUIController } from "context";
 
-function Calendar({ 
+const Calendar = ({ 
   header = {
     title: "",
     date: "",
   }, 
   ...rest 
-}) {
+}) => {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 

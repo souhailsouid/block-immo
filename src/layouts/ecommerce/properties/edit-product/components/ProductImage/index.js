@@ -9,7 +9,7 @@ import MDButton from "components/MDButton";
 // Images
 import productImage from "assets/images/products/product-11.jpg";
 
-function ProductImage() {
+const ProductImage = () => {
   return (
     <Card
       sx={{

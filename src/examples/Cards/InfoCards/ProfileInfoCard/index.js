@@ -18,7 +18,7 @@ import MDTypography from "components/MDTypography";
 import colors from "assets/theme/base/colors";
 import typography from "assets/theme/base/typography";
 
-function ProfileInfoCard({ title, description, info, social, action, shadow = true }) {
+const ProfileInfoCard = ({ title, description, info, social, action, shadow = true }) => {
   const labels = [];
   const values = [];
   const { socialMediaColors } = colors;

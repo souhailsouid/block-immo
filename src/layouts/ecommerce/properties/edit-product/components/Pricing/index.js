@@ -11,7 +11,7 @@ import MDInput from "components/MDInput";
 // NewProduct page components
 import FormField from "layouts/ecommerce/products/edit-product/components/FormField";
 
-function Pricing() {
+const Pricing = () => {
   return (
     <Card sx={{ overflow: "visible" }}>
       <MDBox p={3}>

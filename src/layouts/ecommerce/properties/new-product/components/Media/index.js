@@ -5,7 +5,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDDropzone from "components/MDDropzone";
 
-function Media() {
+const Media = () => {
   return (
     <MDBox>
       <MDTypography variant="h5">Media</MDTypography>

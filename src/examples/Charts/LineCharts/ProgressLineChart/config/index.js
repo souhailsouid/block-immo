@@ -1,4 +1,4 @@
-/* eslint-disable no-dupe-keys */
+ 
 
 // Material Dashboard 3 PRO React base styles
 import colors from "assets/theme/base/colors";

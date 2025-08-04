@@ -41,13 +41,13 @@ ChartJS.register(
   Legend
 );
 
-function RadarChart({ 
+const RadarChart = ({ 
   icon = { color: "info", component: "" }, 
   title = "", 
   description = "", 
   height, 
   chart 
-}) {
+}) => {
   const chartDatasets = chart.datasets
     ? chart.datasets.map((dataset) => ({
         ...dataset,

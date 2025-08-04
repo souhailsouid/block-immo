@@ -98,3 +98,4 @@ src/config/googleMaps.js
 *.key
 *.pem
 secrets.json
+.vercel

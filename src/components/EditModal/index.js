@@ -6,7 +6,7 @@ import {
   Typography,
   Box,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';;
+import CloseIcon from '@mui/icons-material/Close';
 import MDBox from 'components/MDBox';
 
 const EditModal = ({ open, onClose, title, children}) => {

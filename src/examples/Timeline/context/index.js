@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 const Timeline = createContext();
 
 // Timeline context provider
-function TimelineProvider({ children, value }) {
+const TimelineProvider = ({ children, value }) => {
   return <Timeline.Provider value={value}>{children}</Timeline.Provider>;
 }
 
@@ -14,4 +14,4 @@ function useTimeline() {
 }
 
 export { TimelineProvider, useTimeline };
-/* eslint-enable react/prop-types */
+ 

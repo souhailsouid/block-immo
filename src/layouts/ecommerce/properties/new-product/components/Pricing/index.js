@@ -10,7 +10,7 @@ import MDInput from "components/MDInput";
 // NewProduct page components
 import FormField from "layouts/ecommerce/products/new-product/components/FormField";
 
-function Pricing() {
+const Pricing = () => {
   return (
     <MDBox>
       <MDTypography variant="h5">Pricing</MDTypography>

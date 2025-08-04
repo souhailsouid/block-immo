@@ -15,7 +15,7 @@ import MDEditorRoot from "components/MDEditor/MDEditorRoot";
 // Material Dashboard 3 PRO React context
 import { useMaterialUIController } from "context";
 
-function MDEditor({ value = "" }) {
+const MDEditor = ({ value = "" }) => {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 

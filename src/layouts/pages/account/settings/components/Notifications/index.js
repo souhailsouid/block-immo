@@ -12,7 +12,7 @@ import MDTypography from "components/MDTypography";
 // Setting pages components
 import TableCell from "layouts/pages/account/settings/components/TableCell";
 
-function Notifications() {
+const Notifications = () => {
   return (
     <Card id="notifications">
       <MDBox p={3} lineHeight={1}>

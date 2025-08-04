@@ -10,7 +10,7 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-function ComplexStatisticsCard({ 
+const ComplexStatisticsCard = ({ 
   color = "info",
   title = "",
   count = "",
@@ -20,7 +20,7 @@ function ComplexStatisticsCard({
     label: ""
   },
   icon
-}) {
+}) => {
   return (
     <Card>
       <MDBox display="flex" justifyContent="space-between" pt={1} px={2}>

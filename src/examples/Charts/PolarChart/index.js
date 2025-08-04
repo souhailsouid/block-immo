@@ -26,13 +26,13 @@ import configs from "examples/Charts/PolarChart/configs";
 
 ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
 
-function PolarChart({ 
+const PolarChart = ({ 
   icon = { color: "info", component: "" }, 
   title = "", 
   description = "", 
   chart, 
   height 
-}) {
+}) => {
   const { data, options } = configs(chart.labels || [], chart.datasets || {});
 
   const renderChart = (

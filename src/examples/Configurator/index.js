@@ -34,7 +34,7 @@ import {
   setDarkMode,
 } from "context";
 
-function Configurator() {
+const Configurator = () => {
   const [controller, dispatch] = useMaterialUIController();
   const {
     openConfigurator,

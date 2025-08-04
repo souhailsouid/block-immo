@@ -10,13 +10,13 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-function DefaultInfoCard({ 
+const DefaultInfoCard = ({ 
   color = "info", 
   icon, 
   title, 
   description = "", 
   value = "" 
-}) {
+}) => {
   return (
     <Card>
       <MDBox p={2} mx={3} display="flex" justifyContent="center">

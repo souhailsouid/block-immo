@@ -14,7 +14,7 @@ import MDInput from "components/MDInput";
 // NewProduct page components
 import FormField from "layouts/ecommerce/products/edit-product/components/FormField";
 
-function ProductInfo() {
+const ProductInfo = () => {
   const [editorValue, setEditorValue] = useState(
     `<p>
       Long sleeves black denim jacket with a twisted design. Contrast stitching. Button up closure. White arrow prints on the back.

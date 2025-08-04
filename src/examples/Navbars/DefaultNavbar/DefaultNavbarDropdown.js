@@ -12,7 +12,7 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-function DefaultNavbarDropdown({
+const DefaultNavbarDropdown = ({
   name,
   icon = false,
   children = false,
@@ -22,7 +22,7 @@ function DefaultNavbarDropdown({
   route = "",
   collapse,
   ...rest
-}) {
+}) => {
   const linkComponent = {
     component: "a",
     href,

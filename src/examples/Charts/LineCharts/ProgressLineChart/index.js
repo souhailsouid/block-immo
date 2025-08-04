@@ -40,7 +40,7 @@ ChartJS.register(
   Filler
 );
 
-function ProgressLineChart({ color = "info", icon, title, count = 0, progress, height = "6.25rem", chart }) {
+const ProgressLineChart = ({ color = "info", icon, title, count = 0, progress, height = "6.25rem", chart }) => {
   const { data, options } = configs(color, chart.labels || [], title, chart.data || []);
 
   return (

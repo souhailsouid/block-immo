@@ -12,11 +12,11 @@ import MDTypography from "components/MDTypography";
 // Material Dashboard 3 PRO React contexts
 import { useMaterialUIController } from "context";
 
-function DefaultStatisticsCard({ title, count, percentage = {
+const DefaultStatisticsCard = ({ title, count, percentage = {
   color: "success",
   value: "",
   label: "",
-}, dropdown = false }) {
+}, dropdown = false }) => {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 

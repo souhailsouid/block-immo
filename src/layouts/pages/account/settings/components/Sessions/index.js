@@ -8,7 +8,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDBadge from "components/MDBadge";
 
-function Sessions() {
+const Sessions = () => {
   const actionButtonStyles = {
     "& .material-icons-round": {
       transform: `translateX(0)`,

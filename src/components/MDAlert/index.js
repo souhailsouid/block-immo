@@ -13,7 +13,7 @@ import MDBox from "components/MDBox";
 import MDAlertRoot from "components/MDAlert/MDAlertRoot";
 import MDAlertCloseIcon from "components/MDAlert/MDAlertCloseIcon";
 
-function MDAlert({ color = "info", dismissible = false, children, ...rest }) {
+const MDAlert = ({ color = "info", dismissible = false, children, ...rest }) => {
   const [alertStatus, setAlertStatus] = useState("mount");
 
   const handleAlertStatus = () => setAlertStatus("fadeOut");

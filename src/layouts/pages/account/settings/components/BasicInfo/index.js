@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useState, useEffect } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -12,8 +13,10 @@ import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
 import MDButton from 'components/MDButton';
 import MDInput from 'components/MDInput';
+
 // Settings page components
 import FormField from 'layouts/pages/account/components/FormField';
+import BasicInfoSkeleton from './BasicInfoSkeleton';
 
 // User profile hook
 import { useUserProfileDynamo } from 'hooks/useUserProfileDynamo';
@@ -41,7 +44,7 @@ const basicInfoValidation = Yup.object().shape({
     .email('Invalid email format')
     .required('Email is required'),
   phone: Yup.string()
-    .matches(/^[+]?[\d\s\-\(\)]+$/, 'Invalid phone number format'),
+    .matches(/^[+]?[\d\s\-()]+$/, 'Invalid phone number format'),
   location: Yup.string()
     .max(100, 'Location must be less than 100 characters'),
   gender: Yup.string()
@@ -218,16 +221,7 @@ const BasicInfo = () => {
   };
 
   if (isLoading) {
-    return (
-      <Card id="basic-info" sx={{ overflow: 'visible' }}>
-        <MDBox p={3}>
-          <MDTypography variant="h5">Profile information</MDTypography>
-          <MDTypography variant="body2" color="text">
-            Loading information...
-          </MDTypography>
-        </MDBox>
-      </Card>
-    );
+    return <BasicInfoSkeleton />;
   }
 
   return (

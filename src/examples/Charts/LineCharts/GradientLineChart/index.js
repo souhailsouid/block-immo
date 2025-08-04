@@ -45,7 +45,7 @@ ChartJS.register(
   Filler
 );
 
-function GradientLineChart({ icon = { color: "info", component: "" }, title = "", description = "", height = "19.125rem", chart }) {
+const GradientLineChart = ({ icon = { color: "info", component: "" }, title = "", description = "", height = "19.125rem", chart }) => {
   const chartRef = useRef(null);
   const [chartData, setChartData] = useState({});
 

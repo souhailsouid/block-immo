@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import apiClient from '../../config/axiosConfig';
 import API_ENDPOINTS from '../../config/endpoints';
 
@@ -26,16 +27,12 @@ class InvestmentService {
       // }
       
       // Appel à la vraie API
-      console.log('🔍 API call to:', API_ENDPOINTS.INVESTMENTS.BUY_SHARES);
-      console.log('🔍 Purchase data:', purchaseData);
+
       
       const response = await apiClient.post(API_ENDPOINTS.INVESTMENTS.BUY_SHARES, purchaseData);
       
-      console.log('🔍 API response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('🔍 API error:', error);
-      console.error('🔍 Error response:', error.response?.data);
       throw new Error('Investment failed. Please try again.');
     }
   }
@@ -54,6 +51,7 @@ class InvestmentService {
       
       return response.data;
     } catch (error) {
+        
       console.error('Error loading portfolio:', error);
       // En cas d'erreur, retourner un portfolio vide
       return {

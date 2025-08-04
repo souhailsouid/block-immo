@@ -13,7 +13,7 @@ import MDInput from "components/MDInput";
 // NewProduct page components
 import FormField from "layouts/ecommerce/products/new-product/components/FormField";
 
-function ProductInfo() {
+const ProductInfo = () => {
   return (
     <MDBox>
       <MDTypography variant="h5">Product Information</MDTypography>

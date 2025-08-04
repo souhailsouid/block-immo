@@ -12,7 +12,7 @@ import MDTypography from "components/MDTypography";
 import MDAvatar from "components/MDAvatar";
 
 // Custom styles for ComplexProjectCard
-function ComplexProjectCard({ color = "dark", image, title, dateTime = "", description, members = [], dropdown = false }) {
+const ComplexProjectCard = ({ color = "dark", image, title, dateTime = "", description, members = [], dropdown = false }) => {
   const renderMembers = members.map((member, key) => {
     const memberKey = `member-${key}`;
 

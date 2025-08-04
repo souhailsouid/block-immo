@@ -36,7 +36,7 @@ ChartJS.register(
   Legend
 );
 
-function ReportsBarChart({ color = "info", title, description = "", date, chart }) {
+const ReportsBarChart = ({ color = "info", title, description = "", date, chart }) => {
   const { data, options } = configs(chart.labels || [], chart.datasets || {});
 
   return (

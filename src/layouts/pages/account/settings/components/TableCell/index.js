@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-function TableCell({ width = "auto", align = "left", padding = [], noBorder = false, children }) {
+const TableCell = ({ width = "auto", align = "left", padding = [], noBorder = false, children }) => {
   return (
     <MDBox
       component="th"

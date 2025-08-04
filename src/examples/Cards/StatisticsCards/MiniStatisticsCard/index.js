@@ -13,7 +13,7 @@ import MDTypography from "components/MDTypography";
 // Material Dashboard 3 PRO React context
 import { useMaterialUIController } from "context";
 
-function MiniStatisticsCard({ 
+const MiniStatisticsCard = ({ 
   bgColor = "white", 
   title = {
     fontWeight: "light",
@@ -26,7 +26,7 @@ function MiniStatisticsCard({
   }, 
   icon, 
   direction = "right" 
-}) {
+}) => {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 

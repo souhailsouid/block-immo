@@ -41,24 +41,34 @@ import Icon from '@mui/material/Icon';
 // Images
 import defaultProfilePicture from 'assets/images/team-3.jpg';
 
+// Hook pour obtenir les infos utilisateur
+import { useAuth } from 'hooks/useAuth';
 
 
 // Composant personnalisé pour l'avatar de la sidenav
 const SidenavAvatar = ({ userInfo }) => {
-  const { profilePicture, fullName } = userInfo || {};
+  // Gestion sûre des props - s'assurer que userInfo est un objet
+  const safeUserInfo = (userInfo && typeof userInfo === 'object') ? userInfo : {
+    profilePicture: null,
+    fullName: 'User',
+    userProfile: {
+      avatar: {
+        seed: 'default',
+        style: 'pixelArt'
+      }
+    }
+  };
+  
+  const { profilePicture, fullName } = safeUserInfo;
 
   // Fonction pour déterminer si c'est un avatar DiceBear
-  const isDiceBearAvatar = (avatarData) => {
-    return avatarData?.type === 'dicebear' || avatarData?.style;
-  };
+  const isDiceBearAvatar = safeUserInfo?.userProfile?.avatar?.seed && safeUserInfo?.userProfile?.avatar?.style;
 
-
-  // Fonction pour afficher l'avatar approprié
-  if (isDiceBearAvatar(userInfo?.userProfile?.avatar)) {
+  if (isDiceBearAvatar) {
     return (
       <DiceBearAvatar
-        seed={userInfo?.userProfile?.avatar?.seed || 'default'}
-        style={userInfo?.userProfile?.avatar?.style || 'pixelArt'}
+        seed={safeUserInfo?.userProfile?.avatar?.seed || 'default'}
+        style={safeUserInfo?.userProfile?.avatar?.style || 'pixelArt'}
         size="sm"
         sx={{
           border: '2px solid #fff',
@@ -80,22 +90,31 @@ SidenavAvatar.propTypes = {
   userInfo: PropTypes.object.isRequired,
 };
 
-const routes = (userInfo) => {
-  // Extraire les informations utilisateur
-  const firstName = userInfo?.firstName || (typeof userInfo === 'string' ? userInfo : 'User');
-  const lastName = userInfo?.lastName || '';
-  const fullName = userInfo?.fullName || `${firstName} ${lastName}`.trim();
-
+// Fonction pour les routes (compatible avec l'ancienne API)
+const routes = (userInfo = null) => {
+  // Extraire les informations utilisateur avec des valeurs par défaut sûres
+  const firstName = userInfo?.given_name || userInfo?.firstName || 'User';
+  const lastName = userInfo?.family_name || userInfo?.lastName || '';
+  const fullName = userInfo?.name || `${firstName} ${lastName}`.trim() || 'User';
 
   // S'assurer que fullName est une chaîne
   const displayName = typeof fullName === 'string' ? fullName : 'User';
+
+  // Créer un objet userInfo par défaut sûr
+  const safeUserInfo = userInfo || {
+    given_name: 'User',
+    family_name: '',
+    name: 'User',
+    profilePicture: null,
+    fullName: 'User'
+  };
 
   return [
     {
       type: 'collapse',
       name: displayName,
       key: 'user-profile',
-      icon: <SidenavAvatar userInfo={userInfo} />,
+      icon: <SidenavAvatar userInfo={safeUserInfo} />,
       collapse: [
         {
           name: 'My Profile',

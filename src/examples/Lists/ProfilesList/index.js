@@ -13,7 +13,7 @@ import MDTypography from "components/MDTypography";
 import MDAvatar from "components/MDAvatar";
 import MDButton from "components/MDButton";
 
-function ProfilesList({ title, profiles, shadow = true }) {
+const ProfilesList = ({ title, profiles, shadow = true }) => {
   const renderProfiles = profiles.map(
     ({ image, name, description, action }) => (
       <MDBox

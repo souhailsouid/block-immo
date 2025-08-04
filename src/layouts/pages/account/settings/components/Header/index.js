@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // @mui material components
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -8,6 +9,9 @@ import MDTypography from 'components/MDTypography';
 import MDAvatar from 'components/MDAvatar';
 import MDBadge from 'components/MDBadge';
 import AvatarDisplay from 'components/AvatarDisplay';
+
+// Skeleton components
+import { AvatarSkeleton, TextSkeleton, ChipSkeleton } from 'components/MDSkeleton';
 
 // User profile hook
 import { useUserProfile } from 'hooks/useUserProfile';
@@ -48,25 +52,17 @@ const Header = () => {
         <MDBox p={2}>
           <Grid container spacing={3} alignItems="center">
             <Grid item>
-              <MDAvatar 
-                src={defaultProfilePicture} 
-                alt="profile-image" 
-                size="xl" 
-                shadow="sm"
-                sx={{ 
-                  bgcolor: 'grey.300',
-                  animation: 'pulse 1.5s ease-in-out infinite'
-                }}
-              />
+              <AvatarSkeleton size={64} />
             </Grid>
-            <Grid item>
+            <Grid item xs>
               <MDBox height="100%" mt={0.5} lineHeight={1}>
-                <MDTypography variant="h5" fontWeight="medium">
-                    Loading...
-                </MDTypography>
-                <MDTypography variant="button" color="text" fontWeight="medium">
-                  Loading profile...
-                </MDTypography>
+                <TextSkeleton lines={1} height={28} />
+                <MDBox mt={1}>
+                  <TextSkeleton lines={1} height={16} />
+                </MDBox>
+                <MDBox mt={1}>
+                  <ChipSkeleton width={100} height={20} />
+                </MDBox>
               </MDBox>
             </Grid>
           </Grid>

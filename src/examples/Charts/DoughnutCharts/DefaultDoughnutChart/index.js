@@ -20,13 +20,13 @@ import configs from "examples/Charts/DoughnutCharts/DefaultDoughnutChart/configs
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-function DefaultDoughnutChart({ 
+const DefaultDoughnutChart = ({ 
   icon = { color: "info", component: "" }, 
   title = "", 
   description = "", 
   height = "19.125rem", 
   chart 
-}) {
+}) => {
   const { data, options } = configs(
     chart.labels || [],
     chart.datasets || {},

@@ -1,3 +1,4 @@
+import { formatCurrencyWithLocale } from './currencyMapping';
 function formatCurrency(value, currency = 'USD', locale = null) {
   if (!value) return '';
   
@@ -14,7 +15,7 @@ function formatCurrency(value, currency = 'USD', locale = null) {
   
   // Sinon, utiliser la locale appropriée pour la devise
   try {
-    const { formatCurrencyWithLocale } = require('./currencyMapping');
+
     return formatCurrencyWithLocale(value, currency);
   } catch (error) {
     // Fallback vers la fonction originale

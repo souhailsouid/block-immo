@@ -13,7 +13,8 @@ const container = document.getElementById("app");
 if (validateAWSConfig()) {
   configureAmplify();
 } else {
-  }
+  console.error("AWS configuration is invalid");
+}
 
 const root = createRoot(container);
 
