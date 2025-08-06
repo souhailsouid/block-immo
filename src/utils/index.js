@@ -17,7 +17,7 @@ function formatCurrency(value, currency = 'USD', locale = null) {
   try {
 
     return formatCurrencyWithLocale(value, currency);
-  } catch (error) {
+  } catch (_error) {
     // Fallback vers la fonction originale
     const hasDecimals = value % 1 !== 0;
     return value?.toLocaleString('en-US', {

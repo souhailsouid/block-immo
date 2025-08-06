@@ -8,7 +8,6 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://752uv9np1l.execut
  * @returns {Promise<string>} Token JWT
  */
 export const getAuthToken = async () => {
-  console.log('🔐 Récupération du token d\'authentification...');
   
   const session = await fetchAuthSession();
   const token = session.tokens?.accessToken?.toString();
@@ -17,7 +16,6 @@ export const getAuthToken = async () => {
     throw new Error('Token d\'authentification non disponible');
   }
 
-  console.log('✅ Token récupéré:', token.substring(0, 20) + '...');
   return token;
 };
 

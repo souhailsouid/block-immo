@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import React from 'react';
 import { useAuth } from 'hooks/useAuth';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MDBox from 'components/MDBox';
 
 const AuthDebug = () => {
@@ -14,7 +14,8 @@ const AuthDebug = () => {
     forceUpdate 
   } = useAuth();
   const location = useLocation();
-
+  console.log('location', location)
+  const navigate = useNavigate();
   // Afficher les états en console pour debugging
   React.useEffect(() => {
     console.log('🔍 Auth Debug:', {
@@ -26,6 +27,9 @@ const AuthDebug = () => {
       pathname: location.pathname,
       forceUpdate
     });
+    if ( ["/", "/properties"].includes(location.pathname) ) {
+      navigate('/dashboards/market-place');
+    }
   }, [isAuthenticated, loading, authCheckComplete, error, user, location.pathname, forceUpdate]);
 
   // Affichage visuel en développement seulement

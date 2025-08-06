@@ -45,8 +45,8 @@ const SignInIllustration = () => {
   } = useForm({
     resolver: yupResolver(
       Yup.object().shape({
-        email: Yup.string().email('Email invalide').required('Email requis'),
-        password: Yup.string().min(6, 'Au moins 6 caractères').required('Mot de passe requis'),
+        email: Yup.string().email('Invalid email').required('Email required'),
+        password: Yup.string().required('Password required'),
       })
     ),
   });
@@ -77,26 +77,26 @@ const SignInIllustration = () => {
       console.log('✅ Sign in successful');
       
       // Afficher notification de succès
-      showNotification('Connexion réussie ! Redirection en cours...', 'success');
+      showNotification('Connection successful ! Redirecting...', 'success');
       
       // La redirection sera gérée par useEffect
       
     } catch (error) {
       console.error('❌ Sign in error:', error);
       
-      let errorMessage = 'Erreur de connexion. Veuillez réessayer.';
+      let errorMessage = 'Connection error. Please try again.';
       
       // Messages d'erreur spécifiques
       if (error.name === 'UserNotConfirmedException') {
-        errorMessage = 'Veuillez confirmer votre compte par email avant de vous connecter.';
+        errorMessage = 'Please confirm your account by email before signing in.';
         navigate('/authentication/email-verification', { 
           state: { email: data.email } 
         });
         return;
       } else if (error.name === 'NotAuthorizedException') {
-        errorMessage = 'Email ou mot de passe incorrect.';
+        errorMessage = 'Incorrect email or password.';
       } else if (error.name === 'UserNotFoundException') {
-        errorMessage = 'Aucun compte trouvé avec cet email.';
+        errorMessage = 'No account found with this email.';
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -211,17 +211,17 @@ const SignInIllustration = () => {
             {isSubmitting ? (
               <MDBox display="flex" alignItems="center" gap={1}>
                 <CircularProgress size={20} color="inherit" />
-                Connexion en cours...
+                Sign in in progress...
               </MDBox>
             ) : (
-              'Se connecter'
+              'Sign in'
             )}
           </MDButton>
         </MDBox>
         
         <MDBox mt={3} textAlign="center">
           <MDTypography variant="button" color="text">
-            Mot de passe oublié ?{' '}
+             Forgot your password ?{' '}
             <MDTypography
               component={Link}
               to="/authentication/reset-password"
@@ -230,13 +230,13 @@ const SignInIllustration = () => {
               fontWeight="medium"
               textGradient
             >
-              Réinitialiser
+              Reset password
             </MDTypography>
           </MDTypography>
         </MDBox>
         <MDBox textAlign="center">
           <MDTypography variant="button" color="text">
-            Pas de compte ?{' '}
+            No account ?{' '}
             <MDTypography
               component={Link}
               to="/authentication/sign-up/illustration"
@@ -245,7 +245,7 @@ const SignInIllustration = () => {
               fontWeight="medium"
               textGradient
             >
-              S&apos;inscrire
+              Sign up
             </MDTypography>
           </MDTypography>
         </MDBox>
