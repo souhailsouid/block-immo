@@ -18,9 +18,7 @@ const AppLoadingScreen = () => (
     bgColor="grey-100"
   >
     <MDBox
-      component="img"
-      src="/src/assets/images/logos/logo-light.png"
-      alt="Block Immo"
+
       width="120px"
       mb={2}
     />

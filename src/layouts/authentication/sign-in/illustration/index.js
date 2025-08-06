@@ -74,12 +74,8 @@ const SignInIllustration = () => {
         password: data.password
       });
       
-      console.log('✅ Sign in successful');
       
-      // Afficher notification de succès
-      showNotification('Connection successful ! Redirecting...', 'success');
-      
-      // La redirection sera gérée par useEffect
+  
       
     } catch (error) {
       console.error('❌ Sign in error:', error);

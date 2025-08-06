@@ -133,13 +133,11 @@ export const PublicRoute = ({ children }) => (
 
 // Composant wrapper pour les routes d'authentification (redirection si déjà connecté)
 export const AuthRoute = ({ children }) => {
-  const { isAuthenticated, loading, authCheckComplete } = useAuth();
+  const { isAuthenticated, authCheckComplete } = useAuth();
   
-  if (loading || !authCheckComplete) {
-    return <AuthLoadingScreen />;
-  }
-  
-  if (isAuthenticated) {
+  // Pour les pages d'auth, ne pas afficher de loading, laisser la page gérer elle-même
+  // Seulement rediriger si l'utilisateur est déjà authentifié ET que la vérification est complète
+  if (isAuthenticated && authCheckComplete) {
     console.log('User is authenticated, redirecting to dashboard from auth route');
     return <Navigate to="/dashboards/market-place" replace />;
   }
