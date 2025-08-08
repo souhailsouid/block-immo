@@ -20,6 +20,7 @@ import BasicInfoSkeleton from './BasicInfoSkeleton';
 
 // User profile hook
 import { useUserProfileDynamo } from 'hooks/useUserProfileDynamo';
+import { useUserProfile } from 'hooks/useUserProfile';
 
 // Profile service
 import { profileService } from 'services/api/modules/auth/profileService';
@@ -64,8 +65,7 @@ const BasicInfo = () => {
     updateProfile,
     refreshProfile 
   } = useUserProfileDynamo();
-  
-  console.log('userProfile', userProfile);
+  const { userProfile: userProfileHook } = useUserProfile();
   const { showNotification } = useNotification();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -95,10 +95,9 @@ const BasicInfo = () => {
     };
 
     const birthDateComponents = parseBirthDate(userProfile?.birthDate);
-    
     return ({
-      firstName: userProfile?.firstName || '',
-      lastName: userProfile?.lastName || '',
+      firstName: userProfile?.firstName || userProfileHook?.firstName || '',
+      lastName: userProfile?.lastName || userProfileHook?.lastName || '',
       email: userProfile?.email || '',
       location: userProfile?.location || '',
       phone: userProfile?.phone || '',

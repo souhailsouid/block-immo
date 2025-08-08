@@ -160,11 +160,11 @@ export default function ZigZagGrid({ propertyId: propPropertyId }) {
             key: photo.key || photo
           }));
           
-          console.log('🖼️ Loaded property photos:', photoObjects.length);
+         
           setImages(photoObjects);
           setCurrentImage(photoObjects[0]); // Définir la première photo comme courante
         } else {
-          console.log(`ℹ️ No photos found for property ${propertyId}, using fallback images`);
+          
           setImages(fallbackImages);
           setCurrentImage(image1);
         }
@@ -182,8 +182,7 @@ export default function ZigZagGrid({ propertyId: propPropertyId }) {
 
     // 🎧 ÉCOUTER L'ÉVÉNEMENT DE MISE À JOUR DES PHOTOS
     const handlePhotosUpdate = (event) => {
-      if (event.detail.propertyId === propertyId) {
-        console.log('🔄 Received photos update event for property:', propertyId);
+      if (event.detail.propertyId === propertyId) { 
         loadPropertyPhotos(); // Recharger les photos
       }
     };

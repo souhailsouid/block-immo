@@ -23,9 +23,7 @@ const AddPropertyBasicForm = ({
 }) => {
   const initialValues = mergeInitialValues(initialData, DEFAULT_VALUES_ADD_PROPERTY);
 
-  const handleSubmit = (values, { setSubmitting, setErrors }) => {
-    console.log('📝 Formulaire soumis avec les valeurs:', values);
-    console.log('🔍 Erreurs de validation:', setErrors);
+  const handleSubmit = (values) => {
     onSubmit(values);
   };
 

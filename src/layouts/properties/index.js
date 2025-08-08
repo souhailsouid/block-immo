@@ -57,7 +57,7 @@ const PropertiesPage = () => {
     // 🎧 ÉCOUTER L'ÉVÉNEMENT DE MISE À JOUR DES PHOTOS
     const handlePhotosUpdate = (event) => {
       if (event.detail.propertyId === propertyId) {
-        console.log('🔄 Received photos update event for property:', propertyId);
+      
         loadPhotoCount(); // Recharger le compteur
       }
     };

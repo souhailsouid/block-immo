@@ -13,17 +13,15 @@ import MDTypography from 'components/MDTypography';
 import MDButton from 'components/MDButton';
 import { formatCurrency } from 'utils';
 
-const BuySharesModal = ({ onSave, onClose, initialData }) => {
+const BuySharesModal = ({ onClose, initialData }) => {
+ 
   const { showNotification } = useNotification();
-  const { addTransaction, setLoading, setError } = useInvestment();
-  const { user } = useAuth();
-  console.log('user', user);
+  const { addTransaction } = useInvestment();
+  const { user } = useAuth(); 
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState('selection'); // 'selection', 'confirmation', 'payment', 'success'
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // Debug temporaire
-  // console.log('🔍 BuySharesModal initialData:', initialData);
   
   const blockValue = 10;
   const propertyPrice = parseFloat(initialData?.propertyPrice?.toString().replace(/[^0-9.]/g, '')) || 1000000;
@@ -85,19 +83,13 @@ const BuySharesModal = ({ onSave, onClose, initialData }) => {
       // Validation du userId
       const userId = user?.username || user?.userId || user?.id || user?.sub || user?.attributes?.sub || 'test-user-id';
       if (!userId || userId === 'test-user-id') {
-        console.log('🔍 User object:', user);
+        
         throw new Error('User ID is missing. Please log in again.');
       }
       
       // Validation des données avant envoi
       const customAmountValue = parseFloat(customAmount);
-      console.log('🔍 Debug values:', {
-        customAmount,
-        customAmountValue,
-        blockCount,
-        propertyId: initialData?.propertyId,
-        userId: user?.id || user?.sub
-      });
+      
       
       if (isNaN(customAmountValue) || customAmountValue < 10) {
         throw new Error('Please enter a valid amount (minimum 10€)');
@@ -108,11 +100,7 @@ const BuySharesModal = ({ onSave, onClose, initialData }) => {
       const recalculatedBlocks = Math.floor(recalculatedBlockValue / 10);
       const recalculatedInvestmentAmount = recalculatedBlockValue;
       
-      console.log('🔍 Recalculated values:', {
-        recalculatedBlockValue,
-        recalculatedBlocks,
-        recalculatedInvestmentAmount
-      });
+     
       
       if (recalculatedBlocks <= 0) {
         throw new Error('Please select a valid number of blocks (minimum 1)');
@@ -171,12 +159,8 @@ const BuySharesModal = ({ onSave, onClose, initialData }) => {
         };
         
         addTransaction(transaction);
-        console.log('🔍 Investment data:', investmentData);
-        // Pas besoin d'appeler onSave car l'appel API est déjà fait
-        // await onSave(investmentData);
-        
-        // Rafraîchir le portfolio dans le dashboard investor
-        // Invalider les requêtes React Query pour forcer le refresh
+   
+   
         if (queryClient) {
           queryClient.invalidateQueries(['portfolio']);
           queryClient.invalidateQueries(['recent-transactions']);

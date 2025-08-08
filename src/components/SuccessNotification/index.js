@@ -8,15 +8,15 @@ import MDButton from 'components/MDButton';
 
 // Material-UI components
 import { Alert, AlertTitle, Collapse } from '@mui/material';
-import { CheckCircle, Close } from '@mui/icons-material';
+import {  Close } from '@mui/icons-material';
 
-const SuccessNotification = ({ message, onClose, autoHide = true, duration = 5000 }) => {
+const SuccessNotification = ({ message, type, onClose, autoHide = true, duration = 5000 }) => {
   const location = useLocation();
   const stateMessage = location.state?.message;
-  const stateType = location.state?.messageType;
+  const stateType = location.state?.messageType 
   
   const displayMessage = message || stateMessage;
-  const messageType = stateType || 'success';
+  const messageType = type || stateType;
   
   useEffect(() => {
     if (autoHide && displayMessage) {

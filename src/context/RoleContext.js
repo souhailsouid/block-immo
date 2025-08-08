@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { checkUserGroups, getStoredUserRole, hasRole, hasPermission } from 'utils/cognitoUtils';
+import { checkUserGroups, hasPermission } from 'utils/cognitoUtils';
 import { useAuth } from 'hooks/useAuth';
 
 // Définition des rôles disponibles

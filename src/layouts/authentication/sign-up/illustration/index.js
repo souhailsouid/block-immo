@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { signUp as amplifySignUp } from '@aws-amplify/auth';
 
 // Material Dashboard 3 PRO React components
@@ -13,8 +13,7 @@ import MDButton from 'components/MDButton';
 
 // Authentication layout components
 import IllustrationLayout from 'layouts/authentication/components/IllustrationLayout';
-import NotificationNavbar from 'layouts/pages/notifications/NotificationNavbar';
-
+import { useNotification } from 'context/NotificationContext';
 // Image
 import fractional_real_estate from 'assets/images/fractional_real_estate.png';
 
@@ -25,7 +24,6 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const SignUpIllustration = () => {
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -64,7 +62,7 @@ const SignUpIllustration = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
-
+  const { showNotification } = useNotification();
   async function handleSignUp(data) {
     try {
       setIsLoading(true);
@@ -72,7 +70,7 @@ const SignUpIllustration = () => {
       setShowErrorMessage(false);
       setError('root', null);
 
-      console.log('📝 Tentative d\'inscription avec Amplify:', { email: data.email, firstName: data.firstName, lastName: data.lastName });
+     
 
       // Utiliser Amplify directement pour l'inscription
       const result = await amplifySignUp({
@@ -88,11 +86,12 @@ const SignUpIllustration = () => {
         }
       });
 
-      console.log('✅ Inscription réussie avec Amplify:', result);
+     
       setShowSuccessMessage(true);
       
       // Message de confirmation
-      setError('root', { type: 'manual', message: '🎉 Inscription réussie ! Vérifiez votre email pour confirmer votre compte.' });
+      showNotification('🎉 Sign up successful!', "Please check your email to confirm your account.", 'success');
+
       
    
 

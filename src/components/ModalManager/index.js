@@ -35,7 +35,6 @@ const ModalManager = () => {
    */
   const handleSave = async (updatedData) => {
     try {
-      // console.log('🔄 Mise à jour via ModalManager...');
 
       const modalType = modalState.type;
       const config = getModalConfig(modalType);
@@ -64,7 +63,7 @@ const ModalManager = () => {
       if (!config.skipApiCall && !config.isSpecialModal) {
         // Nettoyer les données
         const cleanUpdatedData = cleanData(updatedData, config.cleanFields);
-        // console.log('🧹 Données nettoyées:', cleanUpdatedData);
+       
 
         // Gérer les services externes
         let serviceMethod;
@@ -81,9 +80,9 @@ const ModalManager = () => {
         }
 
         result = await serviceMethod(propertyId, cleanUpdatedData);
-        // console.log('✅ Mise à jour réussie:', result);
+       
       } else {
-        // console.log('✅ Upload terminé - aucun appel API supplémentaire nécessaire');
+       
         result = updatedData; // Utiliser les données directement
       }
 
@@ -169,7 +168,6 @@ const ModalManager = () => {
         />
       );
     }
-// console.log('🔍 modalState.data:', modalState.data)
     // Configuration standard pour les formulaires
     return (
       <ModalComponent

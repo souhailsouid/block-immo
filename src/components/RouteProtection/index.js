@@ -55,7 +55,7 @@ const RouteProtection = ({ children, requireAuth = true, redirectTo = '/authenti
       const gracePeriod = 3000; // 3 secondes
       
       if (timeSinceLogin < gracePeriod) {
-        console.log('Grace period active, skipping validation');
+          
         return;
       }
 
@@ -99,7 +99,7 @@ const RouteProtection = ({ children, requireAuth = true, redirectTo = '/authenti
 
   // Route protégée - vérifier l'authentification
   if (requireAuth && !isAuthenticated) {
-    console.log('Accès non   autorisé à une route protégée, redirection vers:', redirectTo);
+  
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
@@ -138,7 +138,7 @@ export const AuthRoute = ({ children }) => {
   // Pour les pages d'auth, ne pas afficher de loading, laisser la page gérer elle-même
   // Seulement rediriger si l'utilisateur est déjà authentifié ET que la vérification est complète
   if (isAuthenticated && authCheckComplete) {
-    console.log('User is authenticated, redirecting to dashboard from auth route');
+    
     return <Navigate to="/dashboards/market-place" replace />;
   }
   

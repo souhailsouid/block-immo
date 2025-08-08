@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }) => {
       const timeSinceLastCheck = lastCheck ? Date.now() - lastCheck : Infinity;
       
       if (timeSinceLastCheck < 5000) { // 5 secondes de grâce après la dernière vérification
-        console.log('Recent login detected, ignoring auth error');
+         
         return; // Ne pas traiter l'erreur
       }
       
@@ -168,7 +168,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       
       const result = await authService.login(credentials);
-      
+   
       const userBasicInfo = {
         username: result.user?.username,
         email: result.user?.email,

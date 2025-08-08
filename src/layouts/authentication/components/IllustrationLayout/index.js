@@ -26,7 +26,7 @@ const IllustrationLayout = ({
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
-  console.log('🔍 IllustrationLayout - Props:', { title, description, illustration, backgroundSize });
+    
 
   return (
     <PageLayout background="white">

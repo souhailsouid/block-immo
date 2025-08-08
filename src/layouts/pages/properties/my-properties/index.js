@@ -68,27 +68,14 @@ const MyPropertiesPage = () => {
     try {
       setLoading(true);
       const response = await getProperties();
-      
-      console.log('🔍 Toutes les propriétés:', response);
-      console.log('👤 User profile:', userProfile);
-      console.log('👤 User ID:', userProfile?.userId);
-      console.log('👤 User email:', userProfile?.email);
+    
       
       // Filtrer les propriétés du professionnel connecté
       const userProperties = response.filter(property => {
-        console.log(`🏠 Property ${property.propertyId}:`, {
-          createdBy: property.createdBy,
-          createdByUserId: property.createdByUserId,
-          userEmail: userProfile?.email,
-          userId: userProfile?.userId,
-          matchesEmail: property.createdBy === userProfile?.email,
-          matchesUserId: property.createdByUserId === userProfile?.userId
-        });
         // Essayer d'abord par userId, puis par email comme fallback
         return property.createdByUserId === userProfile?.userId || property.createdBy === userProfile?.email;
       });
-      
-      console.log('✅ Propriétés filtrées:', userProperties);
+            
       setProperties(userProperties);
     } catch (error) {
       console.error('❌ Erreur lors du chargement des propriétés:', error);
@@ -99,9 +86,7 @@ const MyPropertiesPage = () => {
   };
 
   const getPropertiesByCategory = (category) => {
-    console.log(`📊 Filtrage par catégorie: ${category}`);
-    console.log('🏠 Propriétés disponibles:', properties.map(p => ({ id: p.propertyId, status: p.status })));
-    
+  
     let filtered;
     switch (category) {
       case 'COMMERCIALIZED':
@@ -118,8 +103,7 @@ const MyPropertiesPage = () => {
       default:
         filtered = properties;
     }
-    
-    console.log(`✅ Propriétés filtrées pour ${category}:`, filtered.map(p => ({ id: p.propertyId, status: p.status })));
+  
     return filtered;
   };
 

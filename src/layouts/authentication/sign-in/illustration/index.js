@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
@@ -25,17 +25,32 @@ import bgImage from 'assets/images/illustrations/illustration-real-estate.png';
 import { useAuth } from 'hooks/useAuth';
 import { useNotification } from 'context/NotificationContext';
 
+// Components
+import ConfirmationCode from 'components/ConfirmationCode';
+
 const SignInIllustration = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isAuthenticated, loading: authLoading } = useAuth();
   const { showNotification } = useNotification();
-  
+  const [showSuccessNotification, setShowSuccessNotification] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [emailToConfirm, setEmailToConfirm] = useState('');
   
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => event.preventDefault();
+
+  const handleConfirmationSuccess = () => {
+    showNotification('Account confirmed successfully! You can now sign in.', 'success');
+    setShowConfirmation(false);
+    setEmailToConfirm('');
+  };
+
+  const handleConfirmationError = (error) => {
+    showNotification(error.message || 'Error during confirmation', 'error');
+  };
 
   const {
     register,
@@ -55,7 +70,7 @@ const SignInIllustration = () => {
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       const from = location.state?.from?.pathname || '/dashboards/market-place';
-      console.log('User already authenticated, redirecting to:', from);
+         
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, authLoading, navigate, location.state]);
@@ -65,11 +80,10 @@ const SignInIllustration = () => {
     
     setIsSubmitting(true);
     
-    try {
-      console.log('🔄 Attempting sign in...');
+    try {  
       
       // Utiliser le hook useAuth
-      await login({
+     await login({
         email: data.email,
         password: data.password
       });
@@ -85,9 +99,9 @@ const SignInIllustration = () => {
       // Messages d'erreur spécifiques
       if (error.name === 'UserNotConfirmedException') {
         errorMessage = 'Please confirm your account by email before signing in.';
-        navigate('/authentication/email-verification', { 
-          state: { email: data.email } 
-        });
+        showNotification('Please confirm your account with the code sent to your email.', 'warning');
+        setEmailToConfirm(data.email);
+        setShowConfirmation(true);
         return;
       } else if (error.name === 'NotAuthorizedException') {
         errorMessage = 'Incorrect email or password.';
@@ -135,18 +149,33 @@ const SignInIllustration = () => {
     );
   }
 
+  const handleSuccess = () => {
+    setShowSuccessNotification(true);
+    showNotification('Account confirmed successfully! You can now sign in.', 'success');
+  }
+
+
+
   return (
     <IllustrationLayout
       title="Join BlockImmo"
       description="Create your account to start investing in real estate"
       illustration={bgImage}
     >
-      <MDBox component="form" role="form" onSubmit={handleSubmit(handleSignIn)}>
+      {showConfirmation ? (
+        <ConfirmationCode 
+          email={emailToConfirm}
+          onSuccess={handleConfirmationSuccess}
+          onError={handleConfirmationError}
+          handleSuccess={handleSuccess}
+        />
+      ) : (
+        <MDBox component="form" role="form" onSubmit={handleSubmit(handleSignIn)}>
         {/* Affichage d'erreur */}
         {errors?.root && (
           <MDBox mb={3} p={2} bgcolor="error.light" borderRadius={1}>
             <MDTypography variant="body2" color="error">
-              <strong>Erreur:</strong> {errors.root.message}
+               {errors.root.message}
             </MDTypography>
           </MDBox>
         )}
@@ -214,7 +243,6 @@ const SignInIllustration = () => {
             )}
           </MDButton>
         </MDBox>
-        
         <MDBox mt={3} textAlign="center">
           <MDTypography variant="button" color="text">
              Forgot your password ?{' '}
@@ -246,6 +274,7 @@ const SignInIllustration = () => {
           </MDTypography>
         </MDBox>
       </MDBox>
+      )}
     </IllustrationLayout>
   );
 };

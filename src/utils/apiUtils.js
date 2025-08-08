@@ -58,12 +58,9 @@ export const apiRequest = async (options = {}) => {
 
     const url = options.url || `${API_BASE_URL}${options.endpoint || ''}`;
     
-    console.log('🌐 Appel API:', url);
-    console.log('📦 Options:', finalOptions);
 
     const response = await fetch(url, finalOptions);
     
-    console.log('📊 Status de la réponse:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -72,7 +69,6 @@ export const apiRequest = async (options = {}) => {
     }
 
     const result = await response.json();
-    console.log('✅ Données reçues:', result);
 
     // Gérer le format de réponse de l'API Gateway
     if (result.body) {
@@ -142,7 +138,6 @@ export const apiRequestWithoutAuth = async (endpoint, options = {}) => {
       }
     };
 
-    console.log('🌐 Appel API sans auth:', `${API_BASE_URL}${endpoint}`);
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, finalOptions);
     
@@ -176,15 +171,12 @@ export const apiRequestS3 = async (options = {}) => {
     
     // ✅ GESTION SPÉCIALE POUR FormData
     if (options.body instanceof FormData) {
-      console.log('📤 FormData detected - letting browser set Content-Type with boundary');
       body = options.body;
       // ✅ NE PAS définir Content-Type pour FormData - le navigateur le fait automatiquement
     } else if (options.data && ['POST', 'PUT', 'PATCH'].includes(options.method?.toUpperCase())) {
-      console.log('📤 JSON data detected');
       body = JSON.stringify(options.data);
       headers['Content-Type'] = 'application/json';
     } else if (options.body) {
-      console.log('📤 Raw body detected');
       body = options.body;
       headers['Content-Type'] = 'application/json';
     }
@@ -201,7 +193,6 @@ export const apiRequestS3 = async (options = {}) => {
     // ✅ Pour FormData, s'assurer qu'on ne force pas de Content-Type
     if (options.body instanceof FormData) {
       delete finalOptions.headers['Content-Type'];
-      console.log('📤 Removed Content-Type header for FormData');
     }
 
     // Ajouter le body si présent
@@ -211,12 +202,9 @@ export const apiRequestS3 = async (options = {}) => {
 
     const url = options.url || `${API_BASE_URL}${options.endpoint || ''}`;
     
-    console.log('🌐 Appel API:', url);
-    console.log('📦 Options:', finalOptions);
 
     const response = await fetch(url, finalOptions);
-    
-    console.log('📊 Status de la réponse:', response.status);
+  
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -225,7 +213,6 @@ export const apiRequestS3 = async (options = {}) => {
     }
 
     const result = await response.json();
-    console.log('✅ Données reçues:', result);
 
     // Gérer le format de réponse de l'API Gateway
     if (result.body) {

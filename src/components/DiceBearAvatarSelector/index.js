@@ -85,7 +85,7 @@ const DiceBearAvatarSelector = ({ open, onClose, onSelect, currentAvatar, userPr
       };
 
        
-      console.log('🔍 Données envoyées à la Lambda:', updateData);
+        
 
       const result = await profileService.updateUserProfile(updateData);
 

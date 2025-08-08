@@ -17,9 +17,8 @@ import { useUserProfile } from 'hooks/useUserProfile';
 
 const Settings = () => {
   const { userProfile } = useUserProfile();
-  console.log('userProfile', userProfile);
-  console.log('userProfile?.role', userProfile?.role);
-  console.log('userProfile?.role === PROFESSIONAL', userProfile?.role === 'PROFESSIONAL');
+  
+
   return (
     <BaseLayout>
       <MDBox mt={4}>

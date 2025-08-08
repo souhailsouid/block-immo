@@ -20,17 +20,38 @@ class AuthService {
    */
   async login(credentials) {
     try {
-      const user = await signIn({ 
+      const result = await signIn({ 
         username: credentials.email, 
         password: credentials.password 
       });
+      
+      // Vérifier s'il y a un nextStep qui nécessite une action
+      if (result.nextStep) {
+       
+        
+        if (result.nextStep.signInStep === 'CONFIRM_SIGN_UP') {
+          // L'utilisateur doit confirmer son compte
+          const error = new Error('Account confirmation required');
+          error.name = 'UserNotConfirmedException';
+          error.nextStep = result.nextStep;
+          error.username = credentials.email;
+          throw error;
+        }
+        
+        // Autres étapes possibles (MFA, etc.)
+        if (result.nextStep.signInStep !== 'DONE') {
+          const error = new Error(`Additional step required: ${result.nextStep.signInStep}`);
+          error.nextStep = result.nextStep;
+          throw error;
+        }
+      }
       
       // Récupérer la session pour obtenir le token
       const session = await fetchAuthSession();
       const token = session.tokens?.accessToken?.toString();
       
       return {
-        user,
+        user: result.user || result,
         token,
         isAuthenticated: true
       };

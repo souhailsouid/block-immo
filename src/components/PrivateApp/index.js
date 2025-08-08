@@ -58,7 +58,7 @@ const PrivateApp = ({ children }) => {
 
   // Si non authentifié ET que la vérification est complète
   if (!isAuthenticated && authCheckComplete) {
-    console.log('User not authenticated, redirecting to login');
+    
     return (
       <Navigate 
         to="/authentication/sign-in/illustration" 

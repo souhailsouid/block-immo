@@ -14,19 +14,11 @@ const AuthDebug = () => {
     forceUpdate 
   } = useAuth();
   const location = useLocation();
-  console.log('location', location)
+        
   const navigate = useNavigate();
   // Afficher les états en console pour debugging
   React.useEffect(() => {
-    console.log('🔍 Auth Debug:', {
-      isAuthenticated,
-      loading,
-      authCheckComplete,
-      error: error?.message || null,
-      user: user ? 'Present' : 'Null',
-      pathname: location.pathname,
-      forceUpdate
-    });
+    
     if ( ["/", "/properties"].includes(location.pathname) ) {
       navigate('/dashboards/market-place');
     }
@@ -51,14 +43,14 @@ const AuthDebug = () => {
       boxShadow="0 2px 8px rgba(0,0,0,0.15)"
       maxWidth="300px"
     >
-      <MDBox fontWeight="bold" mb={1}>Auth Debug</MDBox>
+      {/* <MDBox fontWeight="bold" mb={1}>Auth Debug</MDBox>
       <MDBox>Authenticated: {isAuthenticated ? '✅' : '❌'}</MDBox>
       <MDBox>Loading: {loading ? '⏳' : '✅'}</MDBox>
       <MDBox>Check Complete: {authCheckComplete ? '✅' : '⏳'}</MDBox>
       <MDBox>Error: {error ? '❌' : '✅'}</MDBox>
       <MDBox>User: {user ? '✅' : '❌'}</MDBox>
-      <MDBox>Route: {location.pathname}</MDBox>
-      <MDBox>Update: #{forceUpdate}</MDBox>
+      <MDBox>Route: {location.pathname}</MDBox> */}
+      {/* <MDBox>Update: #{forceUpdate}</MDBox> */}
     </MDBox>
   );
 };

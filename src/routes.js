@@ -60,6 +60,7 @@ const SidenavAvatar = ({ userInfo }) => {
   };
   
   const { profilePicture, fullName } = safeUserInfo;
+    
 
   // Fonction pour déterminer si c'est un avatar DiceBear
   const isDiceBearAvatar = safeUserInfo?.userProfile?.avatar?.seed && safeUserInfo?.userProfile?.avatar?.style;
@@ -95,7 +96,7 @@ const routes = (userInfo = null) => {
   // Extraire les informations utilisateur avec des valeurs par défaut sûres
   const firstName = userInfo?.given_name || userInfo?.firstName || 'User';
   const lastName = userInfo?.family_name || userInfo?.lastName || '';
-  const fullName = userInfo?.name || `${firstName} ${lastName}`.trim() || 'User';
+  const fullName = userInfo?.fullName || `${firstName} ${lastName}`.trim() || 'User';
 
   // S'assurer que fullName est une chaîne
   const displayName = typeof fullName === 'string' ? fullName : 'User';

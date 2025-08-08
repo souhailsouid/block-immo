@@ -11,14 +11,14 @@ import { apiRequest, apiRequestWithoutAuth } from 'utils/apiUtils';
  */
 export const signUp = async (signUpData) => {
   try {
-    console.log('📝 Inscription utilisateur:', signUpData.email);
+
     
     const response = await apiRequestWithoutAuth('/auth/sign-up', {
       method: 'POST',
       body: JSON.stringify(signUpData)
     });
 
-    console.log('✅ Inscription réussie');
+
     return response;
   } catch (error) {
     console.error('❌ Erreur lors de l\'inscription:', error);
@@ -41,8 +41,6 @@ export const signUp = async (signUpData) => {
  */
 export const signIn = async (signInData) => {
   try {
-   
-    
     const response = await apiRequestWithoutAuth('/auth/sign-in', {
       method: 'POST',
       body: JSON.stringify(signInData)
@@ -72,11 +70,7 @@ export const signIn = async (signInData) => {
  */
 export const getUserProfile = async () => {
   try {
-    console.log('👤 Récupération du profil utilisateur...');
-    
     const response = await apiRequest('/user/profile');
-    
-    console.log('✅ Profil récupéré');
     return response;
   } catch (error) {
     console.error('❌ Erreur lors de la récupération du profil:', error);
@@ -96,14 +90,12 @@ export const getUserProfile = async () => {
  */
 export const updateUserProfile = async (profileData) => {
   try {
-    console.log('🔄 Mise à jour du profil utilisateur...');
     
     const response = await apiRequest('/user/profile', {
       method: 'PUT',
       body: JSON.stringify(profileData)
     });
     
-    console.log('✅ Profil mis à jour');
     return response;
   } catch (error) {
     console.error('❌ Erreur lors de la mise à jour du profil:', error);

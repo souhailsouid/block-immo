@@ -61,7 +61,6 @@ import PropertyPage from 'layouts/ecommerce/properties/property-page';
 import AddPropertyPage from 'layouts/pages/properties/add-property';
 import MyProperties from 'layouts/pages/properties/my-properties';
 import LogoutPage from 'layouts/authentication/logout';
-import EmailVerificationPage from 'layouts/authentication/email-verification';
 import RoleTest from 'components/RoleTest';
 import Cover from 'layouts/authentication/reset-password/cover';
 import ConfirmResetPassword from 'layouts/authentication/reset-password/confirm';
@@ -200,11 +199,7 @@ export default function App() {
                           <SignUpIllustration />
                         </AuthRoute>
                       } />
-                      <Route path="/authentication/email-verification" element={
-                        <AuthRoute>
-                          <EmailVerificationPage />
-                        </AuthRoute>
-                      } />
+                     
                       <Route path="/authentication/reset-password" element={
                         <AuthRoute>
                           <Cover />
@@ -284,11 +279,7 @@ export default function App() {
                         <SignUpIllustration />
                       </AuthRoute>
                     } />
-                    <Route path="/authentication/email-verification" element={
-                      <AuthRoute>
-                        <EmailVerificationPage />
-                      </AuthRoute>
-                    } />
+                  
                     <Route path="/authentication/reset-password" element={
                       <AuthRoute>
                         <Cover />

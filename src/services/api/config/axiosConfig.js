@@ -29,15 +29,12 @@ apiClient.interceptors.request.use(
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
            
-          console.log('Token ajouté aux headers:', token.substring(0, 20) + '...');
+    
         } else {
            
           console.warn('Utilisateur connecté mais pas de token disponible');
         }
-      } else {
-         
-        console.log('Aucun utilisateur connecté');
-      }
+      } 
     } catch (error) {
        
       console.error('Erreur lors de la récupération du token:', error);
@@ -64,7 +61,7 @@ apiClient.interceptors.response.use(
       
       try {
          
-        console.log('Tentative de refresh du token...');
+       
         // Tentative de refresh du token
         const session = await fetchAuthSession({ forceRefresh: true });
         const newToken = session.tokens?.accessToken?.toString();
@@ -72,7 +69,7 @@ apiClient.interceptors.response.use(
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
            
-          console.log('Token rafraîchi, nouvelle tentative...');
+         
           return apiClient(originalRequest);
         } else {
            

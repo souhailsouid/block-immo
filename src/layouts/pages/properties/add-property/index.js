@@ -34,14 +34,14 @@ const AddPropertyPage = () => {
     setIsSubmitting(true);
     
     try {
-      console.log('🔄 Création de la propriété:', propertyData);
+     
       
       const response = await createOrUpdateProperty({
         step: 'basic',
         data: propertyData
       });
       
-      console.log('✅ Propriété créée avec succès:', response);
+     
       
       // Afficher une notification de succès
       showNotification('success', 'Property created successfully! You can now add more details.');

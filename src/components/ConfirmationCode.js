@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
@@ -10,11 +11,13 @@ import MDInput from 'components/MDInput';
 import MDButton from 'components/MDButton';
 import authService from 'services/authService';
 
-const ConfirmationCode = ({ email, onSuccess, onError }) => {
+import MDSnackbar from 'components/MDSnackbar';
+const ConfirmationCode = ({ email, onSuccess, onError, handleSuccess }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-
+  const [resendSuccess, setResendSuccess] = useState(false);
+  const [resendError, setResendError] = useState(false);
   const schema = Yup.object().shape({
     code: Yup.string()
       .min(1, 'Confirmation code is required')
@@ -59,16 +62,27 @@ const ConfirmationCode = ({ email, onSuccess, onError }) => {
   };
 
   const handleResendCode = async () => {
+    handleSuccess();
     try {
       setResendLoading(true);
+
+     const result = await authService.resendConfirmationCode(email);
+
       
-      const result = await authService.resendConfirmationCode(email);
-      
-      // Afficher un message de succès
-      alert('Code confirmation resent successfully!');
-      
+     if (result && result.success) {
+       setResendSuccess(true);
+       setResendError(false);
+     } else {
+       setResendError(true);
+       setResendSuccess(false);
+     }
     } catch (error) {
-      alert('Error during resend code: ' + error.message);
+      setResendError(true);
+      setResendSuccess(false);
+      setError('root', { 
+        type: 'manual', 
+        message: error.message || 'Error during resend code' 
+      });
     } finally {
       setResendLoading(false);
     }
@@ -83,7 +97,7 @@ const ConfirmationCode = ({ email, onSuccess, onError }) => {
       <MDTypography variant="body2" color="text.secondary" mb={3}>
         Please enter the confirmation code sent to your email:
       </MDTypography>
-
+   < MDSnackbar title="Code confirmation resent successfully!" type="success" onClose={() => {}}  />
       <MDBox component="form" onSubmit={handleSubmit(handleConfirmation)}>
         <MDBox mb={2}>
           <MDInput
@@ -111,7 +125,7 @@ const ConfirmationCode = ({ email, onSuccess, onError }) => {
         <MDBox mt={3}>
           <MDButton
             variant="gradient"
-            color="success"
+            color="customBlue"
             size="large"
             fullWidth
             type="submit"
@@ -124,7 +138,7 @@ const ConfirmationCode = ({ email, onSuccess, onError }) => {
         <MDBox mt={2} textAlign="center">
           <MDButton
             variant="text"
-            color="info"
+            color="customBlue"
             size="small"
             onClick={handleResendCode}
             disabled={resendLoading}
@@ -132,18 +146,29 @@ const ConfirmationCode = ({ email, onSuccess, onError }) => {
             {resendLoading ? 'Sending...' : 'Resend code'}
           </MDButton>
         </MDBox>
-      </MDBox>
 
-      <MDBox mt={2} textAlign="center">
-        <MDTypography variant="body2" color="text.secondary">
-          Email: {email}
-        </MDTypography>
-        <MDTypography variant="body2" color="text.secondary" mt={1}>
-          Code received: <strong>710326</strong>
-        </MDTypography>
+       {resendSuccess && <MDBox mt={2} textAlign="center">
+          <MDTypography variant="body2" color="success" fontWeight="bold">
+            Code resent successfully! Check your email.
+          </MDTypography>
+        </MDBox>
+        }
+        {resendError && <MDBox mt={2} textAlign="center">
+          <MDTypography variant="body2" color="error" fontWeight="bold">
+            {errors.root.message}
+          </MDTypography>
+        </MDBox>
+        }
       </MDBox>
     </MDBox>
   );
+};
+
+ConfirmationCode.propTypes = {
+  email: PropTypes.string.isRequired,
+  onSuccess: PropTypes.func,
+  onError: PropTypes.func,
+  handleSuccess: PropTypes.func,
 };
 
 export default ConfirmationCode; 

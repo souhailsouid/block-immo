@@ -27,7 +27,7 @@ export const useUserProfile = () => {
         if (tokens?.idToken) {
           const idToken = tokens.idToken.toString();
           const decoded = jwtDecode(idToken);
-          
+        
                   // Extraire les informations utilisateur du token
         const baseProfile = {
           username: currentUser.username,
@@ -59,8 +59,7 @@ export const useUserProfile = () => {
                   ? JSON.parse(dbProfile.data.avatar) 
                   : dbProfile.data.avatar;
               } catch (parseError) {
-                 
-                console.log('Erreur parsing avatar:', parseError);
+                 console.error('Erreur parsing avatar:', parseError);
                 parsedAvatar = null;
               }
             }
@@ -73,6 +72,9 @@ export const useUserProfile = () => {
               avatar: parsedAvatar,
               // Garder les données Cognito en priorité pour certains champs
               username: baseProfile.username,
+              firstName: baseProfile.firstName,
+              lastName: baseProfile.lastName,
+              fullName: baseProfile.fullName,
               userId: baseProfile.userId,
               email: baseProfile.email,
               emailVerified: baseProfile.emailVerified,
@@ -84,13 +86,12 @@ export const useUserProfile = () => {
                         setUserProfile(completeProfile);
             
              
-            console.log('Propriétés récupérées:', completeProfile);
           } else {
             setUserProfile(baseProfile);
           }
         } catch (dbError) {
            
-          console.log('Erreur récupération DynamoDB:', dbError);
+          console.error('Erreur récupération DynamoDB:', dbError);
           setUserProfile(baseProfile);
         }
         

@@ -7,10 +7,7 @@ import { apiRequest, buildQueryUrl, formatApiResponse } from '../../utils/apiUti
  * @returns {Promise<Object>} Réponse de l'API
  */
 export const updatePropertyPrice = async (propertyId, priceData) => {
-  try {
-    console.log('🔄 Mise à jour du prix pour la propriété:', propertyId);
-    console.log('📝 Données de prix:', priceData);
-    
+  try {  
     const response = await apiRequest({
       endpoint: `/properties/${propertyId}/price`,
       method: 'PUT',
@@ -18,7 +15,7 @@ export const updatePropertyPrice = async (propertyId, priceData) => {
     });
 
     const result = formatApiResponse(response);
-    console.log('✅ Prix mis à jour avec succès:', result);
+
 
     return result;
   } catch (error) {
@@ -34,7 +31,6 @@ export const updatePropertyPrice = async (propertyId, priceData) => {
  */
 export const getPropertyPrice = async (propertyId) => {
   try {
-    console.log('🔍 Récupération des données de prix pour la propriété:', propertyId);
 
     const response = await apiRequest({
       endpoint: `/properties/${propertyId}`,
@@ -42,7 +38,6 @@ export const getPropertyPrice = async (propertyId) => {
     });
     
     const result = formatApiResponse(response);
-    console.log('✅ Données de prix récupérées avec succès:', result);
     
     // Extraire les données de prix
     return {
