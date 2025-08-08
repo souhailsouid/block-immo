@@ -93,12 +93,11 @@ const BasicInfo = () => {
         return { month: 'January', day: '1', year: '1990' };
       }
     };
-
     const birthDateComponents = parseBirthDate(userProfile?.birthDate);
     return ({
       firstName: userProfile?.firstName || userProfileHook?.firstName || '',
       lastName: userProfile?.lastName || userProfileHook?.lastName || '',
-      email: userProfile?.email || '',
+      email: userProfile?.email || userProfileHook?.email || '',
       location: userProfile?.location || '',
       phone: userProfile?.phone || '',
       gender: userProfile?.gender || 'Male',

@@ -90,7 +90,7 @@ const SignUpIllustration = () => {
       setShowSuccessMessage(true);
       
       // Message de confirmation
-      showNotification('🎉 Sign up successful!', "Please check your email to confirm your account.", 'success');
+      setShowSuccessMessage(true);
 
       
    
@@ -116,13 +116,23 @@ const SignUpIllustration = () => {
     >
       <MDBox component="form" role="form" onSubmit={handleSubmit(handleSignUp)}>
         {/* Affichage d'erreur ou de succès */}
-        {errors?.root && (
+        {errors?.root && !showSuccessMessage && (
           <MDBox mb={3} p={2} borderRadius={1} sx={{
             border: '1px solid',
             borderColor: errors.root.message?.includes('Félicitations') ? 'success.main' : 'error.main'
           }}>
             <MDTypography variant="body2" color={errors.root.message?.includes('Félicitations') ? 'success.dark' : 'error'}>
               {errors.root.message}
+            </MDTypography>
+          </MDBox>
+        )}
+        {showSuccessMessage && (
+          <MDBox mb={3} p={2} borderRadius={1} sx={{
+            border: '1px solid',
+            borderColor: 'success.main'
+          }}>
+            <MDTypography variant="body2" color="success">
+              Account created successfully. Please sign in to continue.
             </MDTypography>
           </MDBox>
         )}

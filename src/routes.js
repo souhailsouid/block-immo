@@ -39,10 +39,10 @@ import DiceBearAvatar from 'components/DiceBearAvatar';
 import Icon from '@mui/material/Icon';
 
 // Images
-import defaultProfilePicture from 'assets/images/team-3.jpg';
 
-// Hook pour obtenir les infos utilisateur
-import { useAuth } from 'hooks/useAuth';
+import defaultProfilePicture from 'assets/images/bruce-mars.jpg';
+
+
 
 
 // Composant personnalisé pour l'avatar de la sidenav
@@ -63,7 +63,7 @@ const SidenavAvatar = ({ userInfo }) => {
     
 
   // Fonction pour déterminer si c'est un avatar DiceBear
-  const isDiceBearAvatar = safeUserInfo?.userProfile?.avatar?.seed && safeUserInfo?.userProfile?.avatar?.style;
+  const isDiceBearAvatar = safeUserInfo?.userProfile?.avatar?.seed && safeUserInfo?.userProfile?.avatar?.style
 
   if (isDiceBearAvatar) {
     return (

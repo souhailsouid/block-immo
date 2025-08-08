@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 // Material Dashboard 3 PRO React components
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
-import MDAvatar from 'components/MDAvatar';
 import MDBadge from 'components/MDBadge';
 import AvatarDisplay from 'components/AvatarDisplay';
 
