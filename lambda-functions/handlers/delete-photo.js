@@ -11,11 +11,7 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 exports.handler = async (event) => {
   try {
-    console.log("🗑️ Delete photo event:", {
-      method: event.httpMethod,
-      path: event.path,
-      body: event.body
-    });
+
 
     const propertyId = event.pathParameters?.id;
     
@@ -37,24 +33,20 @@ exports.handler = async (event) => {
       
       // 🔐 VÉRIFICATION DES RÔLES - Utiliser les groupes du token JWT
       const userGroups = auth.user.groups || [];
-      console.log("👥 Groupes de l'utilisateur:", userGroups);
       
       // Même logique que upload-property-photo.js : canDeleteFiles pour PROFESSIONAL || ADMIN
       const canDelete = userGroups.includes('professional') || userGroups.includes('admin');
       
       if (!canDelete) {
-        console.log("❌ Accès refusé: Suppression réservée aux professionnels et admins");
         return responses.unauthorized("Accès réservé aux professionnels et administrateurs uniquement");
       }
       
-      console.log("✅ Accès autorisé: Utilisateur professionnel ou admin");
     }
 
     // 📄 PARSER LE BODY JSON
     let requestData;
     try {
       requestData = JSON.parse(event.body || '{}');
-      console.log("📄 Parsed request data:", requestData);
     } catch (parseError) {
       console.error("❌ JSON parse error:", parseError);
       return responses.badRequest("Invalid JSON in request body");
@@ -73,15 +65,11 @@ exports.handler = async (event) => {
 
     // ✅ VÉRIFIER QUE LA PHOTO APPARTIENT À LA PROPRIÉTÉ
     if (!photoUrl.includes(`property-photos/${propertyId}/`)) {
-      console.log("❌ Photo URL does not match property:", photoUrl);
       return responses.unauthorized("Photo does not belong to this property");
     }
 
     // ✅ EXTRACTION DU S3 KEY DEPUIS L'URL
     const s3Key = photoUrl.replace(`https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION || "eu-west-3"}.amazonaws.com/`, '');
-    console.log("🗑️ Extracted S3 key:", s3Key);
-
-    console.log("🗑️ Deleting photo from S3:", s3Key);
 
     // 3. Delete from S3
     const deleteCommand = new DeleteObjectCommand({
@@ -90,10 +78,8 @@ exports.handler = async (event) => {
     });
 
     await s3Client.send(deleteCommand);
-    console.log("✅ Photo deleted from S3");
 
     // 4. Update DynamoDB to remove photo from property
-    console.log("🗄️ Updating DynamoDB to remove photo from property");
     
     // D'abord, récupérer la propriété actuelle
     const { GetCommand } = require("@aws-sdk/lib-dynamodb");
@@ -108,7 +94,7 @@ exports.handler = async (event) => {
     const propertyResult = await docClient.send(getCommand);
     
     if (!propertyResult.Item) {
-      console.log("❌ Property not found:", propertyId);
+
       return responses.notFound("Property not found");
     }
 
@@ -116,8 +102,7 @@ exports.handler = async (event) => {
     const currentPhotos = propertyResult.Item.photos || [];
     const updatedPhotos = currentPhotos.filter(photo => photo !== photoUrl);
     
-    console.log("📸 Current photos:", currentPhotos.length);
-    console.log("📸 Updated photos:", updatedPhotos.length);
+
 
     // Mettre à jour avec la nouvelle liste
     const updateCommand = new UpdateCommand({
@@ -135,7 +120,7 @@ exports.handler = async (event) => {
     });
 
     const result = await docClient.send(updateCommand);
-    console.log("✅ DynamoDB updated successfully");
+
 
     return success(200, {
       success: true,

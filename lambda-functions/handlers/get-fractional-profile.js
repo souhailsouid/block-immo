@@ -8,8 +8,6 @@ const client = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-west-3
 const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-    console.log("=== START get-fractional-profile FUNCTION ===");
-    console.log("Event:", JSON.stringify(event, null, 2));
   
     try {
       // 1. Authentication
@@ -22,10 +20,8 @@ exports.handler = async (event) => {
       const userEmail = user.email;
       const username = user.username || userEmail;
   
-      console.log("🔐 Auth info:", { userId, userEmail, username });
   
       // 2. Vérifier que l'utilisateur est un professionnel
-      console.log("🔐 Vérification du rôle utilisateur...");
       
       try {
         const listGroupsCommand = new AdminListGroupsForUserCommand({
@@ -36,24 +32,21 @@ exports.handler = async (event) => {
         const groupsResponse = await cognitoClient.send(listGroupsCommand);
         const userGroups = groupsResponse.Groups.map(group => group.GroupName);
         
-        console.log("👥 Groupes de l'utilisateur:", userGroups);
         
         // Vérifier si l'utilisateur est professionnel ou admin
         const isProfessional = userGroups.includes('professional') || userGroups.includes('admin');
         
         if (!isProfessional) {
-          console.log("❌ Accès refusé: Utilisateur non professionnel");
           return responses.unauthorized("Accès réservé aux professionnels uniquement");
         }
         
-        console.log("✅ Accès autorisé: Utilisateur professionnel");
         
       } catch (cognitoError) {
         console.error("❌ Erreur lors de la vérification des groupes:", cognitoError);
         
         // Si l'erreur vient du username, essayer avec l'email
         if (cognitoError.name === 'InvalidParameterException' && userEmail && userEmail !== username) {
-          console.log("🔄 Retry avec email...");
+          
           try {
             const listGroupsCommand = new AdminListGroupsForUserCommand({
               Username: userEmail,
@@ -63,16 +56,13 @@ exports.handler = async (event) => {
             const groupsResponse = await cognitoClient.send(listGroupsCommand);
             const userGroups = groupsResponse.Groups.map(group => group.GroupName);
             
-            console.log("👥 Groupes de l'utilisateur (email):", userGroups);
             
             const isProfessional = userGroups.includes('professional') || userGroups.includes('admin');
             
             if (!isProfessional) {
-              console.log("❌ Accès refusé: Utilisateur non professionnel");
               return responses.unauthorized("Accès réservé aux professionnels uniquement");
             }
             
-            console.log("✅ Accès autorisé: Utilisateur professionnel");
           } catch (retryError) {
             console.error("❌ Erreur lors du retry:", retryError);
             return responses.serverError("Erreur lors de la vérification des permissions");
@@ -97,7 +87,6 @@ exports.handler = async (event) => {
       return responses.notFound("User profile not found");
     }
 
-    console.log("✅ Profile found:", Item);
 
     // 3. Extract fractional profile data
     const fractionalProfile = {
@@ -143,7 +132,6 @@ exports.handler = async (event) => {
       updatedAt: Item.updatedAt?.S
     };
 
-    console.log("✅ Fractional profile extracted:", fractionalProfile);
     
     return success(200, {
       success: true,

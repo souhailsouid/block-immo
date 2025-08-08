@@ -6,15 +6,14 @@ const { detectCountryCode } = require("../utils/locationUtils");
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-  console.log("=== DÉBUT FONCTION update-user-profile ===");
-  console.log("Event:", JSON.stringify(event, null, 2));
+
 
   try {
     // 1. Authentification
     const auth = await requireAuth(event);
     if (!auth.success) return responses.unauthorized();
 
-    const userId = auth.userId;
+    const userId = auth.user.userId;
 
     // 2. Données à mettre à jour
     let updateData;
@@ -25,7 +24,7 @@ exports.handler = async (event) => {
       return responses.badRequest("Corps de requête invalide");
     }
 
-    console.log("📝 Données de profil reçues:", updateData);
+    
 
     // 3. Validation des champs obligatoires
     const requiredFields = ["firstName", "lastName", "email"];
@@ -50,9 +49,9 @@ exports.handler = async (event) => {
     const profileExists = !!Item;
     
     if (profileExists) {
-      console.log("✅ Profil existant trouvé");
+      
     } else {
-      console.log("🆕 Profil non trouvé, création d'un nouveau profil");
+      
     }
 
     // 5. Détection automatique du code pays pour la localisation
@@ -61,7 +60,6 @@ exports.handler = async (event) => {
     
     if (updateData.location) {
       countryCode = detectCountryCode(updateData.location);
-      console.log(`🌍 Localisation détectée: ${updateData.location} → Code pays: ${countryCode}`);
     }
 
     // 6. Préparation des données à mettre à jour
@@ -107,9 +105,6 @@ exports.handler = async (event) => {
       });
     }
 
-    console.log("🔧 Champs à mettre à jour:", fieldsToUpdate);
-    console.log(`🌍 Code pays détecté: ${countryCode}`);
-
     // 8. Construction de l'expression de mise à jour
     const updateExpression = [];
     const expressionAttributeNames = {};
@@ -151,7 +146,7 @@ exports.handler = async (event) => {
 
     const { Attributes } = await client.send(updateCommand);
 
-    console.log("✅ Profil utilisateur mis à jour avec succès");
+
 
     return success(200, {
       success: true,

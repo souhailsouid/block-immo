@@ -1,19 +1,20 @@
-const { DynamoDBClient, GetItemCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, GetItemCommand, PutItemCommand } = require("@aws-sdk/client-dynamodb");
 const { requireAuth } = require("../utils/auth");
 const { responses, success } = require("../utils/response");
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-  console.log("=== DÉBUT FONCTION get-user-profile ===");
-  console.log("Event:", JSON.stringify(event, null, 2));
+
 
   try {
     // 1. Authentification
     const auth = await requireAuth(event);
     if (!auth.success) return responses.unauthorized();
 
-    const userId = auth.userId;
+    const userId = auth.user.userId;
+    
+
 
     // 2. Récupération du profil utilisateur
     const getCommand = new GetItemCommand({
@@ -27,7 +28,48 @@ exports.handler = async (event) => {
     const { Item } = await client.send(getCommand);
     
     if (!Item) {
-      return responses.notFound("Profil utilisateur");
+      
+      
+      // Créer un profil de base avec les données du token
+      const now = new Date().toISOString();
+      const basicProfile = {
+        PK: { S: `USER#${userId}` },
+        SK: { S: "PROFILE" },
+        userId: { S: userId },
+        email: { S: auth.user.username }, // Utiliser username comme email
+        firstName: { S: "" }, // Vide pour l'instant
+        lastName: { S: "" }, // Vide pour l'instant
+        role: { S: "INVESTOR" }, // Rôle par défaut
+        createdAt: { S: now },
+        updatedAt: { S: now }
+      };
+      
+      const putCommand = new PutItemCommand({
+        TableName: process.env.DYNAMODB_TABLE,
+        Item: basicProfile
+      });
+      
+      await client.send(putCommand);
+      
+      // Retourner le profil créé
+      return success(200, {
+        success: true,
+        data: {
+          userId: userId,
+          email: auth.user.username, // Utiliser username comme email
+          firstName: "", // Vide pour l'instant
+          lastName: "", // Vide pour l'instant
+          role: "INVESTOR",
+          gender: null,
+          birthDate: null,
+          phone: null,
+          location: null,
+          languages: [],
+          avatar: null,
+          createdAt: now,
+          updatedAt: now
+        }
+      });
     }
 
     // 3. Transformation des données
@@ -75,10 +117,7 @@ exports.handler = async (event) => {
       };
     }
 
-    console.log("✅ Profil utilisateur récupéré avec succès");
-    console.log("🔍 Item brut de DynamoDB:", JSON.stringify(Item, null, 2));
-    console.log("🔍 Avatar brut:", Item.avatar);
-    console.log("🔍 Avatar parsé:", userProfile.avatar);
+
 
     return success(200, {
       success: true,

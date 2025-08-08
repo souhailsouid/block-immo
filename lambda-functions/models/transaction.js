@@ -78,7 +78,7 @@ class TransactionModel {
 
     try {
       await dynamodb.send(new PutCommand(params));
-      console.log('✅ Transaction created:', transactionId);
+        
       return item;
     } catch (error) {
       console.error('❌ Error creating transaction:', error);
@@ -278,7 +278,7 @@ class TransactionModel {
 
     try {
       const result = await dynamodb.send(new UpdateCommand(params));
-      console.log('✅ Transaction updated:', transactionId);
+          
       return result.Attributes;
     } catch (error) {
       console.error('❌ Error updating transaction:', error);
@@ -303,7 +303,7 @@ class TransactionModel {
 
     try {
       await dynamodb.send(new DeleteCommand(params));
-      console.log('✅ Transaction deleted:', transactionId);
+      
       return true;
     } catch (error) {
       console.error('❌ Error deleting transaction:', error);

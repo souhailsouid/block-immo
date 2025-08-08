@@ -9,9 +9,7 @@ const { detectCountryCode } = require("../utils/locationUtils");
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-  console.log("=== DÉBUT FONCTION update-property ===");
-  console.log("Event:", JSON.stringify(event, null, 2));
-
+  
   try {
     // 1. Authentification
     const auth = await requireAuth(event);
@@ -52,7 +50,7 @@ exports.handler = async (event) => {
     // Si un pays est fourni, détecter automatiquement le code pays
     if (updateData.country) {
       countryCode = detectCountryCode(updateData.country);
-      console.log(`🌍 Pays fourni: ${updateData.country} → Code pays: ${countryCode}`);
+      
     }
     
     const fieldsToUpdate = { 

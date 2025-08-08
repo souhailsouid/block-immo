@@ -9,8 +9,7 @@ const client = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-west-3
 const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-  console.log("=== START update-fractional-profile FUNCTION ===");
-  console.log("Event:", JSON.stringify(event, null, 2));
+
 
   try {
     // 1. Authentication
@@ -23,10 +22,8 @@ exports.handler = async (event) => {
     const userEmail = user.email;
     const username = user.username || userEmail;
 
-    console.log("🔐 Auth info:", { userId, userEmail, username });
 
     // 2. Vérifier que l'utilisateur est un professionnel
-    console.log("🔐 Vérification du rôle utilisateur...");
     
     try {
       const listGroupsCommand = new AdminListGroupsForUserCommand({
@@ -36,25 +33,25 @@ exports.handler = async (event) => {
       
       const groupsResponse = await cognitoClient.send(listGroupsCommand);
       const userGroups = groupsResponse.Groups.map(group => group.GroupName);
+
       
-      console.log("👥 Groupes de l'utilisateur:", userGroups);
       
       // Vérifier si l'utilisateur est professionnel ou admin
       const isProfessional = userGroups.includes('professional') || userGroups.includes('admin');
       
       if (!isProfessional) {
-        console.log("❌ Accès refusé: Utilisateur non professionnel");
+        
         return responses.unauthorized("Accès réservé aux professionnels uniquement");
       }
       
-      console.log("✅ Accès autorisé: Utilisateur professionnel");
+      
       
     } catch (cognitoError) {
       console.error("❌ Erreur lors de la vérification des groupes:", cognitoError);
       
       // Si l'erreur vient du username, essayer avec l'email
       if (cognitoError.name === 'InvalidParameterException' && userEmail && userEmail !== username) {
-        console.log("🔄 Retry avec email...");
+        
         try {
           const listGroupsCommand = new AdminListGroupsForUserCommand({
             Username: userEmail,
@@ -64,16 +61,16 @@ exports.handler = async (event) => {
           const groupsResponse = await cognitoClient.send(listGroupsCommand);
           const userGroups = groupsResponse.Groups.map(group => group.GroupName);
           
-          console.log("👥 Groupes de l'utilisateur (email):", userGroups);
+          
           
           const isProfessional = userGroups.includes('professional') || userGroups.includes('admin');
           
           if (!isProfessional) {
-            console.log("❌ Accès refusé: Utilisateur non professionnel");
+            
             return responses.unauthorized("Accès réservé aux professionnels uniquement");
           }
           
-          console.log("✅ Accès autorisé: Utilisateur professionnel");
+          
         } catch (retryError) {
           console.error("❌ Erreur lors du retry:", retryError);
           return responses.serverError("Erreur lors de la vérification des permissions");
@@ -91,8 +88,7 @@ exports.handler = async (event) => {
       return responses.badRequest("Invalid request body");
     }
 
-    console.log("�� Fractional profile data received:", updateData);
-
+    
     // 4. Get existing profile
     const getCommand = new GetItemCommand({
       TableName: process.env.DYNAMODB_TABLE,
@@ -105,19 +101,13 @@ exports.handler = async (event) => {
     const { Item } = await client.send(getCommand);
     const profileExists = !!Item;
     
-    if (profileExists) {
-      console.log("✅ Existing profile found");
-    } else {
-      console.log("�� Profile not found, creating new profile");
-    }
-
     // 5. Auto-detect country code for location
     const now = new Date().toISOString();
     let countryCode = null;
     
     if (updateData.officeAddress) {
       countryCode = detectCountryCode(updateData.officeAddress);
-      console.log(`�� Location detected: ${updateData.officeAddress} → Country code: ${countryCode}`);
+      
     }
 
     // 6. Prepare fractional profile data
@@ -200,7 +190,7 @@ exports.handler = async (event) => {
 
     // 8. Update or create profile
     if (profileExists) {
-      console.log("🔄 Updating existing profile");
+      
       
       const updateExpression = [
         "SET companyName = :companyName",
@@ -280,7 +270,7 @@ exports.handler = async (event) => {
       });
 
       const result = await client.send(updateCommand);
-      console.log("✅ Profile updated successfully");
+      
       
       return success(200, {
         success: true,
@@ -289,7 +279,7 @@ exports.handler = async (event) => {
       });
 
     } else {
-      console.log("🆕 Creating new fractional profile");
+      
       
       const putCommand = new PutItemCommand({
         TableName: process.env.DYNAMODB_TABLE,
@@ -297,7 +287,7 @@ exports.handler = async (event) => {
       });
 
       await client.send(putCommand);
-      console.log("✅ New fractional profile created successfully");
+      
       
       return success(200, {
         success: true,

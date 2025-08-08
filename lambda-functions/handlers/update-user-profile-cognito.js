@@ -11,11 +11,11 @@ const { cognitoClient } = require('../config/aws-config');
  */
 exports.handler = async (event) => {
   try {
-    console.log('🔄 Début de la mise à jour du profil Cognito:', event);
+      
 
     // Vérifier que l'utilisateur est authentifié avec Cognito Authorizer
     if (!event.requestContext?.authorizer?.claims) {
-      console.log('❌ Pas de claims dans l\'authorizer');
+      
       return {
         statusCode: 401,
         headers: {
@@ -36,8 +36,7 @@ exports.handler = async (event) => {
     const userId = userClaims.sub;
     const userEmail = userClaims.email;
 
-    console.log('👤 Utilisateur authentifié:', { userId, userEmail });
-    console.log('📋 Claims complets:', userClaims);
+    
 
     // Parser le corps de la requête
     let requestBody;
@@ -147,7 +146,7 @@ exports.handler = async (event) => {
       });
     }
 
-    console.log('📝 Attributes to update:', cognitoAttributes);
+
 
     if (cognitoAttributes.length === 0) {
       return {
@@ -172,9 +171,9 @@ exports.handler = async (event) => {
       UserAttributes: cognitoAttributes
     });
 
-    const result = await cognitoClient.send(updateCommand);
+    await cognitoClient.send(updateCommand);
 
-    console.log('✅ Cognito user profile updated successfully:', result);
+    
 
     // Retourner la réponse
     return {

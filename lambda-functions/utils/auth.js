@@ -16,12 +16,13 @@ const verifier = CognitoJwtVerifier.create({
  */
 const verifyToken = async (token) => {
   try {
-    console.log('🔐 Vérification du token...');
     const payload = await verifier.verify(token);
     return {
       userId: payload.sub,
       username: payload.username,
       email: payload.email,
+      firstName: payload.given_name || payload.firstName,
+      lastName: payload.family_name || payload.lastName,
       groups: payload['cognito:groups'] || [],
     };
   } catch (error) {
@@ -48,6 +49,8 @@ const decodeToken = (token) => {
       userId: payload.sub,
       username: payload.username,
       email: payload.email,
+      firstName: payload.given_name || payload.firstName,
+      lastName: payload.family_name || payload.lastName,
       groups: payload['cognito:groups'] || [],
     };
   } catch (error) {
@@ -65,23 +68,21 @@ const decodeToken = (token) => {
  */
 const authenticateUser = async (event) => {
   try {
-    console.log('🔐 Authentification...');
+      
 
     // Récupérer le token depuis les headers (comme get-properties)
     const token = event.token
       || event.headers?.Authorization?.replace('Bearer ', '')
       || event.headers?.authorization?.replace('Bearer ', '');
 
-    console.log('Token trouvé:', token ? 'Oui' : 'Non');
 
     if (!token) {
-      console.log('❌ Token manquant');
       return null;
     }
 
     // Vérifier le token
     const user = await verifyToken(token);
-    console.log('Utilisateur vérifié:', user ? 'Oui' : 'Non');
+
 
     return user ? { user, token } : null;
 

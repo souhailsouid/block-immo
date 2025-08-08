@@ -79,7 +79,7 @@ class InvestmentModel {
 
     try {
       await dynamodb.send(new PutCommand(params));
-      console.log('✅ Investment created:', investmentId);
+        ('✅ Investment created:', investmentId);
       return item;
     } catch (error) {
       console.error('❌ Error creating investment:', error);
@@ -203,7 +203,7 @@ class InvestmentModel {
 
     try {
       const result = await dynamodb.send(new UpdateCommand(params));
-      console.log('✅ Investment updated:', investmentId);
+      
       return result.Attributes;
     } catch (error) {
       console.error('❌ Error updating investment:', error);
@@ -228,7 +228,7 @@ class InvestmentModel {
 
     try {
       await dynamodb.send(new DeleteCommand(params));
-      console.log('✅ Investment deleted:', investmentId);
+        
       return true;
     } catch (error) {
       console.error('❌ Error deleting investment:', error);

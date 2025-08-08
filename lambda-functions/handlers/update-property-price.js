@@ -8,9 +8,7 @@ const { detectCountryCode } = require("../utils/locationUtils");
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-  console.log("=== DÉBUT FONCTION update-property-price ===");
-  console.log("Event:", JSON.stringify(event, null, 2));
-
+  
   try {
     // 1. Authentification
     const auth = await requireAuth(event);
@@ -29,8 +27,7 @@ exports.handler = async (event) => {
       return responses.badRequest("Corps de requête invalide");
     }
 
-    console.log("📝 Données de prix reçues:", updateData);
-
+    
     // 4. Validation des données de prix
     const requiredFields = ["propertyPrice", "status"];
     const missingFields = requiredFields.filter(field => 
@@ -48,16 +45,14 @@ exports.handler = async (event) => {
     // Si un pays est fourni, détecter automatiquement le code pays
     if (updateData.country) {
       countryCode = detectCountryCode(updateData.country);
-      console.log(`🌍 Pays fourni: ${updateData.country} → Code pays: ${countryCode}`);
+      
     }
     
     // Si pas de devise fournie mais un code pays est détecté, déterminer automatiquement la devise
     if (!currency && countryCode) {
       currency = getCurrencyFromCountry(countryCode);
-      console.log(`💱 Code pays détecté: ${countryCode} → Devise: ${currency}`);
       
       if (!currency) {
-        console.warn(`⚠️ Aucune devise trouvée pour le code pays: ${countryCode}`);
         currency = 'USD'; // Devise par défaut
       }
     }
@@ -65,7 +60,6 @@ exports.handler = async (event) => {
     // Si toujours pas de devise, utiliser USD par défaut
     if (!currency) {
       currency = 'USD';
-      console.log(`💱 Utilisation de la devise par défaut: ${currency}`);
     }
     
     // Validation de la devise
@@ -114,7 +108,7 @@ exports.handler = async (event) => {
     const { Item } = await client.send(getCommand);
     if (!Item) return responses.notFound("Propriété");
 
-    console.log("✅ Propriété existante trouvée");
+      
 
     // 9. Préparation des données de prix à mettre à jour
     const now = new Date().toISOString();
@@ -131,9 +125,7 @@ exports.handler = async (event) => {
       updatedAt: now
     };
 
-    console.log("🔧 Champs à mettre à jour:", fieldsToUpdate);
-    console.log(`💱 Devise finale utilisée: ${currency}`);
-    console.log(`🌍 Code pays détecté: ${countryCode}`);
+    
 
     // 10. Construction de l'expression de mise à jour
     const updateExpression = [];
@@ -156,7 +148,7 @@ exports.handler = async (event) => {
       }
     });
 
-    console.log("🔧 UpdateExpression:", `SET ${updateExpression.join(", ")}`);
+
 
     // 11. Envoi de la commande Update
     const updateCommand = new UpdateItemCommand({
@@ -174,7 +166,7 @@ exports.handler = async (event) => {
     const { Attributes } = await client.send(updateCommand);
     const updatedProperty = transformDynamoItemToProperty(Attributes);
 
-    console.log("✅ Prix de la propriété mis à jour avec succès");
+    
 
     return success(200, {
       success: true,

@@ -6,8 +6,7 @@ const TransactionModel = require('../models/transaction');
  */
 exports.handler = async (event) => {
   try {
-    console.log('🔄 Get portfolio event:', JSON.stringify(event, null, 2));
-
+    
     // Vérifier la méthode HTTP
     if (event.httpMethod !== 'GET') {
       return {
@@ -95,7 +94,6 @@ exports.handler = async (event) => {
       }
     };
 
-    console.log('✅ Portfolio retrieved successfully for user:', userId);
 
     return {
       statusCode: 200,

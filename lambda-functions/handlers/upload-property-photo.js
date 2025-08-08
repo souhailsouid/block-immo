@@ -26,11 +26,7 @@ const ALLOWED_MIME_TYPES = [
 
 module.exports.handler = async (event) => {
   try {
-    console.log("📦 Event details:", {
-      isBase64Encoded: event.isBase64Encoded,
-      bodyLength: event.body ? event.body.length : 0,
-      contentType: event.headers["content-type"]
-    });
+
 
     // 1. Validate input
     const propertyId = event.pathParameters?.id;
@@ -55,17 +51,15 @@ module.exports.handler = async (event) => {
       
       // 🔐 VÉRIFICATION DES RÔLES - Utiliser les groupes du token JWT
       const userGroups = auth.user.groups || [];
-      console.log("👥 Groupes de l'utilisateur:", userGroups);
       
       // Même logique que verify-roles-secure.js : canUploadFiles pour PROFESSIONAL || ADMIN
       const canUpload = userGroups.includes('professional') || userGroups.includes('admin');
       
       if (!canUpload) {
-        console.log("❌ Accès refusé: Upload réservé aux professionnels et admins");
         return responses.unauthorized("Accès réservé aux professionnels et administrateurs uniquement");
       }
       
-      console.log("✅ Accès autorisé: Utilisateur professionnel ou admin");
+      
     }
 
     // 2. Process multipart data
@@ -80,7 +74,6 @@ module.exports.handler = async (event) => {
 
     parser.on("file", (fieldname, stream, info) => {
       if (fieldname === "file") {
-        console.log("📁 New file detected:", info.filename);
         fileInfo = {
           filename: info.filename,
           mimeType: info.mimeType,
@@ -92,7 +85,6 @@ module.exports.handler = async (event) => {
         stream.on("data", (chunk) => {
           try {
             existingPhotosJson = JSON.parse(chunk.toString());
-            console.log("📸 Existing photos to keep:", existingPhotosJson);
           } catch (e) {
             console.warn("⚠️ Could not parse existing photos");
           }
@@ -102,7 +94,6 @@ module.exports.handler = async (event) => {
         stream.on("data", (chunk) => {
           try {
             const photosToDelete = JSON.parse(chunk.toString());
-            console.log("🗑️ Photos to delete from S3:", photosToDelete);
             // Stocker pour suppression après upload
             event.photosToDelete = photosToDelete;
           } catch (e) {
@@ -155,18 +146,16 @@ module.exports.handler = async (event) => {
         partSize: 5 * 1024 * 1024 // 5MB chunks
       });
 
-      const result = await upload.done();
-      console.log("S3 upload result:", result);
+       await upload.done();
+
 
       // Generate URL
       newPhotoUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION || "eu-west-3"}.amazonaws.com/${s3Key}`;
-      console.log("✅ New photo uploaded:", newPhotoUrl);
     }
 
     // 6. SUPPRIMER LES PHOTOS DE S3 SI NÉCESSAIRE
     let deletedPhotos = [];
     if (event.photosToDelete && Array.isArray(event.photosToDelete)) {
-      console.log("🗑️ Deleting photos from S3:", event.photosToDelete.length);
       
       const { DeleteObjectCommand } = require("@aws-sdk/client-s3");
       
@@ -184,9 +173,7 @@ module.exports.handler = async (event) => {
             
             await s3.send(deleteCommand);
             deletedPhotos.push(photoUrl);
-            console.log("✅ Deleted from S3:", s3Key);
           } else {
-            console.warn("⚠️ Photo does not belong to this property:", photoUrl);
           }
         } catch (error) {
           console.error("❌ Failed to delete photo:", photoUrl, error.message);
@@ -202,24 +189,15 @@ module.exports.handler = async (event) => {
       finalPhotoUrls = existingPhotosJson.filter(url => 
         typeof url === 'string' && url.startsWith('https://') && url.includes('block-immo-images')
       );
-      console.log("📸 Existing photos to keep:", finalPhotoUrls.length);
     }
     
     // Add new photo (if any)
     if (newPhotoUrl) {
       finalPhotoUrls.push(newPhotoUrl);
-      console.log("📸 Added new photo to list");
     }
 
-    console.log("📸 Final photo list:", {
-      total: finalPhotoUrls.length,
-      existing: finalPhotoUrls.length - (newPhotoUrl ? 1 : 0),
-      new: newPhotoUrl ? 1 : 0,
-      deleted: deletedPhotos.length
-    });
 
     // 7. Update DynamoDB with final list (TOUJOURS, même sans nouvelle photo)
-    console.log("🗄️ Updating DynamoDB with final photo list");
     
     const updateCommand = new UpdateCommand({
       TableName: process.env.DYNAMODB_TABLE,
@@ -235,8 +213,8 @@ module.exports.handler = async (event) => {
       ReturnValues: "ALL_NEW"
     });
 
-    const result = await docClient.send(updateCommand);
-    console.log("✅ DynamoDB update successful");
+    await docClient.send(updateCommand);
+    
 
     return success(200, {
       success: true,

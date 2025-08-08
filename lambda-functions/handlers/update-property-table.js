@@ -7,9 +7,7 @@ const { detectCountryCode } = require("../utils/locationUtils");
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-  console.log("=== DÉBUT FONCTION update-property-table ===");
-  console.log("Event:", JSON.stringify(event, null, 2));
-
+  
   try {
     // 1. Authentification
     const auth = await requireAuth(event);
@@ -27,7 +25,7 @@ exports.handler = async (event) => {
       return responses.badRequest("Corps de requête invalide");
     }
 
-    console.log("📝 Données reçues:", updateData);
+    
 
     // 4. Validation spécifique pour PropertyDetailsTableForm
     const requiredFields = ["country", "city"];
@@ -68,7 +66,7 @@ exports.handler = async (event) => {
     const { Item } = await client.send(getCommand);
     if (!Item) return responses.notFound("Propriété");
 
-    console.log("✅ Propriété existante trouvée");
+    
 
     // 7. Détection automatique du code pays et préparation des données
     const now = new Date().toISOString();
@@ -77,7 +75,7 @@ exports.handler = async (event) => {
     // Si un pays est fourni, détecter automatiquement le code pays
     if (updateData.country) {
       countryCode = detectCountryCode(updateData.country);
-      console.log(`🌍 Pays fourni: ${updateData.country} → Code pays: ${countryCode}`);
+      
     }
     
     // Champs spécifiques au PropertyDetailsTableForm
@@ -92,8 +90,7 @@ exports.handler = async (event) => {
       updatedAt: now
     };
 
-    console.log("🔧 Champs à mettre à jour:", fieldsToUpdate);
-    console.log(`🌍 Code pays détecté: ${countryCode}`);
+    
 
     // 8. Construction de l'expression de mise à jour
     const updateExpression = [];
@@ -116,7 +113,7 @@ exports.handler = async (event) => {
       }
     });
 
-    console.log("🔧 UpdateExpression:", `SET ${updateExpression.join(", ")}`);
+    
 
     // 9. Envoi de la commande Update
     const updateCommand = new UpdateItemCommand({
@@ -134,7 +131,7 @@ exports.handler = async (event) => {
     const { Attributes } = await client.send(updateCommand);
     const updatedProperty = transformDynamoItemToProperty(Attributes);
 
-    console.log("✅ Propriété mise à jour avec succès:", updatedProperty);
+          
 
     return success(200, {
       success: true,

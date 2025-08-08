@@ -3,12 +3,11 @@ const { CognitoIdentityProviderClient, AdminListGroupsForUserCommand } = require
 const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-  console.log("=== DÉBUT FONCTION add-custom-claims ===");
-  console.log("Event:", JSON.stringify(event, null, 2));
+
 
   try {
     const email = event.request.userAttributes.email;
-    console.log("📧 Email utilisateur:", email);
+
 
     // Par défaut : INVESTOR
     let role = 'INVESTOR';
@@ -24,7 +23,7 @@ exports.handler = async (event) => {
       const groupsResult = await cognitoClient.send(listGroupsCommand);
       const cognitoGroups = groupsResult.Groups?.map(group => group.GroupName) || [];
 
-      console.log("👥 Groupes Cognito trouvés:", cognitoGroups);
+
 
       // Déterminer le rôle basé sur les groupes Cognito
       if (cognitoGroups.includes('admin')) {
@@ -43,13 +42,12 @@ exports.handler = async (event) => {
       }
 
     } catch (cognitoError) {
-      console.log("⚠️  Erreur lors de la récupération des groupes Cognito:", cognitoError.message);
+
       // En cas d'erreur, on garde le rôle par défaut
       role = 'INVESTOR';
       roleSource = 'Default (error)';
     }
 
-    console.log(`🎯 Rôle attribué: ${role} (source: ${roleSource})`);
 
     // Ajouter le custom claim au token
     event.response = {
@@ -61,7 +59,7 @@ exports.handler = async (event) => {
       }
     };
 
-    console.log("✅ Custom claims ajoutés avec succès");
+
     return event;
 
   } catch (error) {

@@ -15,7 +15,6 @@ const TRANSACTIONS_TABLE = process.env.TRANSACTIONS_TABLE || 'block-immo-api-tra
  */
 exports.handler = async (event) => {
   try {
-    console.log('🔄 Buy shares event:', JSON.stringify(event, null, 2));
 
     // Vérifier la méthode HTTP
     if (event.httpMethod !== 'POST') {
@@ -33,7 +32,7 @@ exports.handler = async (event) => {
 
     // Parser le body
     const requestBody = JSON.parse(event.body);
-    console.log('🔍 Received request body:', requestBody);
+
     const {
       propertyId,
       userId,
@@ -49,7 +48,6 @@ exports.handler = async (event) => {
     } = requestBody;
 
     // Validation des données
-    console.log('🔍 Validation check:', { propertyId, userId, investment, blocks });
     
     const missingFields = [];
     if (!propertyId) missingFields.push('propertyId');
@@ -162,11 +160,6 @@ exports.handler = async (event) => {
       InvestmentModel.create(investmentData),
       TransactionModel.create(transactionData)
     ]);
-
-    console.log('✅ Investment and transaction created successfully:', {
-      investmentId,
-      transactionId
-    });
 
     // Retourner la réponse
     const response = {

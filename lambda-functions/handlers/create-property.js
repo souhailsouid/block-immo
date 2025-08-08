@@ -7,17 +7,13 @@ const { detectCountryCode } = require("../utils/locationUtils");
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-  console.log("=== DÉBUT FONCTION create-property ===");
-  console.log("Event:", JSON.stringify(event, null, 2));
+
 
   try {
     // 1. Authentification
     const auth = await requireAuth(event);
     if (!auth.success) return responses.unauthorized();
 
-    console.log("🔧 auth:", auth);
-    console.log("🔧 auth.user:", auth.username);
-    console.log("🔧 auth.user.email:", auth.user.email);
     
     const userEmail = auth.user?.username;
     const userId = auth.user?.userId; // Ajout de l'ID utilisateur
@@ -26,7 +22,6 @@ exports.handler = async (event) => {
     // Vérifier que l'utilisateur est professionnel ou admin
     const canCreate = userGroups.includes('professional') || userGroups.includes('admin');
     if (!canCreate) {
-      console.log("❌ Accès refusé: Création réservée aux professionnels et admins");
       return responses.forbidden("Accès réservé aux professionnels et administrateurs uniquement");
     }
 
@@ -44,7 +39,7 @@ exports.handler = async (event) => {
     if (!step) return responses.badRequest("Étape requise");
     if (!data) return responses.badRequest("Données requises");
 
-    console.log("📝 Données reçues:", { step, data, propertyId });
+
 
     // 3. Logique de création/mise à jour
     let finalPropertyId = propertyId;
@@ -55,7 +50,6 @@ exports.handler = async (event) => {
       isNewProperty = true;
       finalPropertyId = `PROP_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      console.log("🆕 Création d'une nouvelle propriété:", finalPropertyId);
       
       // Créer la propriété avec statut DRAFT
       const now = new Date().toISOString();
@@ -72,15 +66,12 @@ exports.handler = async (event) => {
         updatedByUserId: { S: userId } // Ajout de l'ID utilisateur
       };
 
-      console.log("🔧 userEmail:", userEmail);
-      console.log("🔧 newProperty.createdBy:", newProperty.createdBy);
-      console.log("🔧 newProperty.updatedBy:", newProperty.updatedBy);
+
 
       // Détection automatique du code pays
       let countryCode = null;
       if (data.country) {
         countryCode = detectCountryCode(data.country);
-        console.log(`🌍 Pays fourni: ${data.country} → Code pays: ${countryCode}`);
       }
 
       // Ajouter les données de base selon l'étape
@@ -104,7 +95,6 @@ exports.handler = async (event) => {
           return responses.badRequest(`Étape ${step} non autorisée pour la création initiale`);
       }
 
-      console.log("🔧 Objet newProperty à envoyer à DynamoDB:", JSON.stringify(newProperty, null, 2));
       
       const putCommand = new PutItemCommand({
         TableName: process.env.DYNAMODB_TABLE,
@@ -112,11 +102,10 @@ exports.handler = async (event) => {
       });
 
       await client.send(putCommand);
-      console.log("✅ Nouvelle propriété créée avec succès");
+
 
     } else {
       // 🔄 MISE À JOUR D'UNE PROPRIÉTÉ EXISTANTE
-      console.log("🔄 Mise à jour de la propriété existante:", finalPropertyId);
       
       // Vérifier que la propriété existe
       const getCommand = new GetItemCommand({
@@ -132,9 +121,6 @@ exports.handler = async (event) => {
 
       // Vérifier que l'utilisateur peut modifier cette propriété
       if (Item.createdBy?.S !== userEmail && Item.createdByUserId?.S !== userId) {
-        console.log("❌ Accès refusé: L'utilisateur n'est pas le créateur de la propriété");
-        console.log(`🔍 Comparaison: Item.createdBy=${Item.createdBy?.S}, userEmail=${userEmail}`);
-        console.log(`🔍 Comparaison: Item.createdByUserId=${Item.createdByUserId?.S}, userId=${userId}`);
         return responses.forbidden("Vous ne pouvez modifier que vos propres propriétés");
       }
 
@@ -156,7 +142,6 @@ exports.handler = async (event) => {
       let countryCode = null;
       if (data.country && (step === 'basic' || step === 'location')) {
         countryCode = detectCountryCode(data.country);
-        console.log(`🌍 Pays fourni: ${data.country} → Code pays: ${countryCode}`);
       }
 
       // Ajouter les données selon l'étape
@@ -246,7 +231,7 @@ exports.handler = async (event) => {
       });
 
       await client.send(updateCommand);
-      console.log("✅ Propriété mise à jour avec succès");
+
     }
 
     // 4. Récupérer la propriété mise à jour pour la réponse

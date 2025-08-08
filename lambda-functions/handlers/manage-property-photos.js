@@ -53,7 +53,7 @@ module.exports.handler = async (event) => {
 
      parser.on("file", (fieldname, stream, info) => {
        if (fieldname === "files") {
-         console.log("📁 New file detected:", info.filename);
+         
          newFiles.push({
            stream,
            filename: info.filename,
@@ -66,13 +66,11 @@ module.exports.handler = async (event) => {
      parser.on("field", (fieldname, value) => {
        if (fieldname === "photosToDelete") {
          photosToDelete = value;
-         console.log("🗑️ Photos to delete:", photosToDelete);
        } else if (fieldname === "existingPhotos") {
          existingPhotos = value;
-         console.log("📸 Existing photos:", existingPhotos);
        } else if (fieldname === "reorderedPhotos") {
          reorderedPhotos = value;
-         console.log("🔄 Reordered photos:", reorderedPhotos);
+         
        }
      });
 
@@ -196,7 +194,7 @@ async function deletePhotos(photoUrls, propertyId) {
      });
 
      const result = await upload.done();
-     console.log("S3 upload result:", result);
+
      
      uploaded.push({
        url: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION || "eu-west-3"}.amazonaws.com/${key}`,

@@ -6,8 +6,7 @@ const { transformDynamoItemToProperty } = require("../models/property");
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-  console.log("=== DÉBUT FONCTION update-property-timeline ===");
-  console.log("Event:", JSON.stringify(event, null, 2));
+
 
   try {
     // 1. Authentification
@@ -27,7 +26,7 @@ exports.handler = async (event) => {
       return responses.badRequest("Corps de requête invalide");
     }
 
-    console.log("📝 Données timeline reçues:", updateData);
+
 
     // 4. Validation des données de timeline
     if (!updateData.timelineData || !Array.isArray(updateData.timelineData)) {
@@ -74,7 +73,7 @@ exports.handler = async (event) => {
     const { Item } = await client.send(getCommand);
     if (!Item) return responses.notFound("Propriété");
 
-    console.log("✅ Propriété existante trouvée");
+
 
     // 6. Préparation des données de timeline à mettre à jour
     const now = new Date().toISOString();
@@ -110,7 +109,7 @@ exports.handler = async (event) => {
       };
     });
 
-    console.log("🔧 Timeline traitée:", processedTimelineData);
+      
 
     // 7. Construction de l'expression de mise à jour
     const updateExpression = ["#timelineData = :timelineData", "#updatedAt = :updatedAt"];
@@ -133,7 +132,7 @@ exports.handler = async (event) => {
       ":updatedAt": { S: now }
     };
 
-    console.log("🔧 UpdateExpression:", `SET ${updateExpression.join(", ")}`);
+    
 
     // 8. Envoi de la commande Update
     const updateCommand = new UpdateItemCommand({
@@ -151,7 +150,7 @@ exports.handler = async (event) => {
     const { Attributes } = await client.send(updateCommand);
     const updatedProperty = transformDynamoItemToProperty(Attributes);
 
-    console.log("✅ Timeline de la propriété mise à jour avec succès");
+
 
     return success(200, {
       success: true,

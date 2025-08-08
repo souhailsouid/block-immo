@@ -7,20 +7,19 @@ const client = new DynamoDBClient({ region: process.env.AWS_REGION || "eu-west-3
 const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.AWS_REGION || "eu-west-3" });
 
 exports.handler = async (event) => {
-  console.log("=== DÉBUT FONCTION verify-roles (SÉCURISÉE) ===");
-  console.log("Event:", JSON.stringify(event, null, 2));
+
 
   try {
     // 1. Authentification sécurisée
     const auth = await requireAuth(event);
     if (!auth.success) {
-      console.log("❌ Authentification échouée");
+      
       return responses.unauthorized("Token d'authentification requis ou invalide");
     }
 
-    const userId = auth.userId;
-    const userEmail = auth.email;
-    console.log("✅ Utilisateur authentifié:", userEmail);
+    const userId = auth.user.userId;
+    const userEmail = auth.user.email;
+
 
     // 2. Vérification des groupes Cognito (PRIORITÉ)
     let cognitoGroups = [];
@@ -37,8 +36,7 @@ exports.handler = async (event) => {
       const groupsResult = await cognitoClient.send(listGroupsCommand);
       cognitoGroups = groupsResult.Groups?.map(group => group.GroupName) || [];
 
-      console.log("👥 Groupes Cognito trouvés:", cognitoGroups);
-
+      
       // Déterminer le rôle basé sur les groupes Cognito
       if (cognitoGroups.includes('admin')) {
         finalRole = 'ADMIN';
@@ -56,7 +54,7 @@ exports.handler = async (event) => {
       }
 
     } catch (cognitoError) {
-      console.log("⚠️  Erreur lors de la récupération des groupes Cognito:", cognitoError.message);
+      
       // En cas d'erreur, on garde le rôle par défaut
       finalRole = 'INVESTOR';
       roleSource = 'Default (error)';
@@ -137,7 +135,7 @@ exports.handler = async (event) => {
       }
 
     } catch (dbError) {
-      console.log("⚠️  Erreur lors de la récupération du profil DynamoDB:", dbError.message);
+      
       // On continue avec le profil de base
     }
 
@@ -155,9 +153,7 @@ exports.handler = async (event) => {
 
     userProfile.permissions = permissions;
 
-    console.log("✅ Vérification des rôles réussie");
-    console.log(`🎯 Rôle final: ${finalRole} (source: ${roleSource})`);
-    console.log(`🔐 Groupes Cognito: ${cognitoGroups.join(', ')}`);
+    
 
     return success(200, {
       success: true,

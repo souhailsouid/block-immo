@@ -10,7 +10,6 @@ const TABLE_NAME = "real_estate_app";
  */
 const getPropertyById = async (propertyId) => {
   try {
-    console.log(`🔍 Recherche de la propriété: ${propertyId}`);
     
     const command = new GetItemCommand({
       TableName: TABLE_NAME,
@@ -23,11 +22,9 @@ const getPropertyById = async (propertyId) => {
     const result = await client.send(command);
     
     if (!result.Item) {
-      console.log('❌ Propriété non trouvée');
       return null;
     }
 
-    console.log('✅ Propriété trouvée');
     return result.Item;
     
   } catch (error) {
@@ -44,7 +41,7 @@ const getPropertyById = async (propertyId) => {
  */
 const getProperties = async (filters = {}, pagination = { page: 1, limit: 20 }) => {
   try {
-    console.log('🔍 Recherche des propriétés avec filtres:', filters);
+     
     
     const { page = 1, limit = 20 } = pagination;
     
@@ -97,7 +94,7 @@ const getProperties = async (filters = {}, pagination = { page: 1, limit: 20 }) 
     const command = new ScanCommand(commandParams);
     const data = await client.send(command);
 
-    console.log(`✅ ${data.Items.length} propriétés trouvées`);
+      
     return data.Items;
     
   } catch (error) {
